@@ -88,8 +88,14 @@ namespace TMKMiniApp.Controllers
             try
             {
                 // Логируем входящие данные для отладки
-                _logger.LogInformation("Получен запрос на создание заказа: INN='{INN}', FirstName='{FirstName}', LastName='{LastName}'", 
-                    orderRequest.INN, orderRequest.FirstName, orderRequest.LastName);
+                _logger.LogInformation("Получен запрос на создание заказа: INN='{INN}', FirstName='{FirstName}', LastName='{LastName}', ItemsCount={ItemsCount}", 
+                    orderRequest.INN, orderRequest.FirstName, orderRequest.LastName, orderRequest.OrderedItems?.Count ?? 0);
+                
+                if (orderRequest.OrderedItems != null && orderRequest.OrderedItems.Any())
+                {
+                    _logger.LogInformation("Первый товар: ID='{ID}', Name='{Name}', Quantity={Quantity}, Unit='{Unit}'", 
+                        orderRequest.OrderedItems[0].ID, orderRequest.OrderedItems[0].Name, orderRequest.OrderedItems[0].Quantity, orderRequest.OrderedItems[0].Unit);
+                }
 
                 // Валидация с помощью FluentValidation
                 var validationResult = await _orderRequestValidator.ValidateAsync(orderRequest);
@@ -111,7 +117,10 @@ namespace TMKMiniApp.Controllers
                         );
                     _logger.LogWarning("Ошибки валидации ModelState: {Errors}", 
                         string.Join(", ", modelStateErrors.Select(kvp => $"{kvp.Key}: {string.Join(", ", kvp.Value)}")));
-                    return BadRequest(ModelState);
+                    
+                    // Возвращаем ошибки в том же формате, что и FluentValidation
+                    var errors = modelStateErrors.Select(kvp => new { Field = kvp.Key, Message = string.Join(", ", kvp.Value) });
+                    return BadRequest(new { Message = "Ошибки валидации", Errors = errors });
                 }
 
                 var order = await _orderService.CreateOrderFromRequestAsync(orderRequest);
