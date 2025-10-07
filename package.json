@@ -1,0 +1,35 @@
+{
+  "name": "tmk-mini-app",
+  "version": "1.0.0",
+  "description": "TMK Mini App - Telegram Mini App for pipe products catalog",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "start": "cd frontend && npm run start",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && dotnet restore"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kioshini/geeks.git"
+  },
+  "keywords": [
+    "telegram",
+    "mini-app",
+    "react",
+    "typescript",
+    "catalog",
+    "e-commerce"
+  ],
+  "author": "TMK Team",
+  "license": "MIT"
+}
