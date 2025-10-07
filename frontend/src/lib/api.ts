@@ -177,10 +177,10 @@ export type CreateOrderDto = {
 export type OrderRequest = {
 	firstName: string;
 	lastName: string;
-	inn: string;
+	INN: string;
 	phone: string;
 	email: string;
-	orderedItems: Array<{
+	OrderedItems: Array<{
 		productId: string;
 		quantity: number;
 		unit: string;

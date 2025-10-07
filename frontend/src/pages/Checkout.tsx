@@ -86,10 +86,10 @@ export function CheckoutPage() {
 			const orderRequest: OrderRequest = {
 				firstName: firstName.trim(),
 				lastName: lastName.trim(),
-				inn: inn.trim(),
+				INN: inn.trim(),
 				phone: phone.trim(),
 				email: email.trim(),
-				orderedItems: cart.items.map(i => ({
+				OrderedItems: cart.items.map(i => ({
 					productId: i.productId.toString(),
 					quantity: i.quantity,
 					unit: i.unit, // Используем единицу измерения из корзины
