@@ -39,15 +39,6 @@ namespace TMKMiniApp.Models.OrderModels
         [JsonPropertyName("Comment")]
         public string? Comment { get; set; }
 
-        [JsonPropertyName("DeliveryAddress")]
-        public string? DeliveryAddress { get; set; }
-
-        [JsonPropertyName("PreferredDeliveryDate")]
-        public DateTime? PreferredDeliveryDate { get; set; }
-
-        [JsonPropertyName("PaymentMethod")]
-        public string? PaymentMethod { get; set; }
-
         [Required(ErrorMessage = "Список товаров обязателен")]
         [MinLength(1, ErrorMessage = "Заказ должен содержать хотя бы один товар")]
         [JsonPropertyName("OrderedItems")]

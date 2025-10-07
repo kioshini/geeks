@@ -44,15 +44,6 @@ namespace TMKMiniApp.Models
         [JsonPropertyName("Comment")]
         public string? Comment { get; set; }              // примечание клиента
         
-        [JsonPropertyName("DeliveryAddress")]
-        public string? DeliveryAddress { get; set; }      // адрес доставки
-        
-        [JsonPropertyName("PreferredDeliveryDate")]
-        public DateTime? PreferredDeliveryDate { get; set; } // желаемая дата доставки
-        
-        [JsonPropertyName("PaymentMethod")]
-        public string? PaymentMethod { get; set; }
-        
         [JsonPropertyName("OrderedItems")]
         public List<OrderItem> Items { get; set; } = new List<OrderItem>();
         

@@ -11,9 +11,6 @@ export function CheckoutPage() {
 	const [phone, setPhone] = useState('');
 	const [email, setEmail] = useState('');
 	const [comment, setComment] = useState('');
-	const [deliveryAddress, setDeliveryAddress] = useState('');
-	const [preferredDeliveryDate, setPreferredDeliveryDate] = useState('');
-	const [paymentMethod, setPaymentMethod] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 	const [human, setHuman] = useState(false);
@@ -93,9 +90,6 @@ export function CheckoutPage() {
 				phone: phone.trim(),
 				email: email.trim(),
 				comment: comment.trim() || undefined,
-				deliveryAddress: deliveryAddress.trim() || undefined,
-				preferredDeliveryDate: preferredDeliveryDate || undefined,
-				paymentMethod: paymentMethod.trim() || undefined,
 				OrderedItems: cart.items.map(i => ({
 					ID: i.productId.toString(),
 					Name: i.product?.name,
@@ -128,9 +122,6 @@ export function CheckoutPage() {
 				setPhone('');
 				setEmail('');
 				setComment('');
-				setDeliveryAddress('');
-				setPreferredDeliveryDate('');
-				setPaymentMethod('');
 				setHuman(false);
 				
 				// Очищаем корзину
@@ -313,54 +304,15 @@ export function CheckoutPage() {
 						</svg>
 						Дополнительно
 					</h2>
-					<div className="space-y-6">
-						<div>
-							<label className="block text-sm font-bold text-gray-700 mb-2">Комментарий к заказу</label>
-							<textarea 
-								value={comment} 
-								onChange={e => setComment(e.target.value)} 
-								placeholder="Особые требования, пожелания и т.д." 
-								rows={3}
-								className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-200"
-							/>
-						</div>
-						
-						<div>
-							<label className="block text-sm font-bold text-gray-700 mb-2">Адрес доставки</label>
-							<input 
-								value={deliveryAddress} 
-								onChange={e => setDeliveryAddress(e.target.value)} 
-								placeholder="Укажите адрес доставки" 
-								className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-							/>
-						</div>
-						
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							<div>
-								<label className="block text-sm font-bold text-gray-700 mb-2">Желаемая дата доставки</label>
-								<input 
-									type="date"
-									value={preferredDeliveryDate} 
-									onChange={e => setPreferredDeliveryDate(e.target.value)} 
-									className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-								/>
-							</div>
-							
-							<div>
-								<label className="block text-sm font-bold text-gray-700 mb-2">Способ оплаты</label>
-								<select 
-									value={paymentMethod} 
-									onChange={e => setPaymentMethod(e.target.value)} 
-									className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-								>
-									<option value="">Выберите способ оплаты</option>
-									<option value="cash">Наличные</option>
-									<option value="card">Банковская карта</option>
-									<option value="transfer">Банковский перевод</option>
-									<option value="other">Другое</option>
-								</select>
-							</div>
-						</div>
+					<div>
+						<label className="block text-sm font-bold text-gray-700 mb-2">Комментарий к заказу</label>
+						<textarea 
+							value={comment} 
+							onChange={e => setComment(e.target.value)} 
+							placeholder="Особые требования, пожелания и т.д." 
+							rows={4}
+							className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-200"
+						/>
 					</div>
 				</div>
 

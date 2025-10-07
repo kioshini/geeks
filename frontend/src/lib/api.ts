@@ -181,9 +181,6 @@ export type OrderRequest = {
 	phone: string;
 	email: string;
 	comment?: string;
-	deliveryAddress?: string;
-	preferredDeliveryDate?: string;
-	paymentMethod?: string;
 	OrderedItems: Array<{
 		ID: string;
 		Name?: string;

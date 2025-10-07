@@ -89,14 +89,6 @@ namespace TMKMiniApp.Services
             sb.AppendLine($"Телефон: {order.Phone}");
             sb.AppendLine($"Email: {order.Email}");
             
-            if (!string.IsNullOrWhiteSpace(order.DeliveryAddress))
-                sb.AppendLine($"Адрес доставки: {order.DeliveryAddress}");
-            
-            if (order.PreferredDeliveryDate.HasValue)
-                sb.AppendLine($"Желаемая дата: {order.PreferredDeliveryDate:yyyy-MM-dd}");
-            
-            if (!string.IsNullOrWhiteSpace(order.PaymentMethod))
-                sb.AppendLine($"Оплата: {order.PaymentMethod}");
             
             if (!string.IsNullOrWhiteSpace(order.Comment))
                 sb.AppendLine($"\nПримечание: {order.Comment}");
