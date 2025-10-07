@@ -31,7 +31,7 @@ namespace TMKMiniApp.Services
                     Quantity = item.Quantity,
                     Price = item.Price,
                     TotalPrice = item.TotalPrice,
-                    Unit = "шт" // Default unit for existing items
+                    Unit = item.Unit
                 });
             }
 
@@ -64,29 +64,70 @@ namespace TMKMiniApp.Services
             
             if (existingItem != null)
             {
-                existingItem.Quantity += addToCartDto.Quantity;
-                existingItem.UpdatedAt = DateTime.UtcNow;
+                var unit = addToCartDto.Unit ?? "т";
                 
-                return new CartItemDto
+                // Если единица измерения совпадает, увеличиваем количество
+                if (existingItem.Unit == unit)
                 {
-                    Id = existingItem.Id,
-                    ProductId = existingItem.ProductId.ToString(),
-                    Product = product,
-                    Quantity = existingItem.Quantity,
-                    Price = existingItem.Price,
-                    TotalPrice = existingItem.TotalPrice,
-                    Unit = addToCartDto.Unit ?? "шт"
-                };
+                    existingItem.Quantity += addToCartDto.Quantity;
+                    existingItem.UpdatedAt = DateTime.UtcNow;
+                    
+                    return new CartItemDto
+                    {
+                        Id = existingItem.Id,
+                        ProductId = existingItem.ProductId.ToString(),
+                        Product = product,
+                        Quantity = existingItem.Quantity,
+                        Price = existingItem.Price,
+                        TotalPrice = existingItem.TotalPrice,
+                        Unit = existingItem.Unit
+                    };
+                }
+                else
+                {
+                    // Если единица измерения отличается, создаем новый элемент
+                    var price = unit == "м" ? product.PriceM : product.PriceT;
+                    
+                    var newCartItem = new CartItem
+                    {
+                        Id = _nextCartItemId++,
+                        UserId = userId,
+                        ProductId = productId,
+                        Quantity = addToCartDto.Quantity,
+                        Price = price,
+                        Unit = unit,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _cartItems.Add(newCartItem);
+
+                    return new CartItemDto
+                    {
+                        Id = newCartItem.Id,
+                        ProductId = newCartItem.ProductId.ToString(),
+                        Product = product,
+                        Quantity = newCartItem.Quantity,
+                        Price = newCartItem.Price,
+                        TotalPrice = newCartItem.TotalPrice,
+                        Unit = unit
+                    };
+                }
             }
             else
             {
+                // Определяем цену в зависимости от единицы измерения
+                var unit = addToCartDto.Unit ?? "т";
+                var price = unit == "м" ? product.PriceM : product.PriceT;
+                
                 var cartItem = new CartItem
                 {
                     Id = _nextCartItemId++,
                     UserId = userId,
                     ProductId = productId,
                     Quantity = addToCartDto.Quantity,
-                    Price = product.Price,
+                    Price = price,
+                    Unit = unit,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
@@ -101,7 +142,7 @@ namespace TMKMiniApp.Services
                     Quantity = cartItem.Quantity,
                     Price = cartItem.Price,
                     TotalPrice = cartItem.TotalPrice,
-                    Unit = addToCartDto.Unit ?? "шт"
+                    Unit = unit
                 };
             }
         }
@@ -118,6 +159,14 @@ namespace TMKMiniApp.Services
                 throw new InvalidOperationException("Недостаточно товара на складе");
 
             cartItem.Quantity = updateCartItemDto.Quantity;
+            
+            // Обновляем цену и единицу измерения, если они изменились
+            if (!string.IsNullOrEmpty(updateCartItemDto.Unit) && updateCartItemDto.Unit != cartItem.Unit)
+            {
+                cartItem.Unit = updateCartItemDto.Unit;
+                cartItem.Price = updateCartItemDto.Unit == "м" ? product.PriceM : product.PriceT;
+            }
+            
             cartItem.UpdatedAt = DateTime.UtcNow;
 
             return new CartItemDto
@@ -128,7 +177,7 @@ namespace TMKMiniApp.Services
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
                 TotalPrice = cartItem.TotalPrice,
-                Unit = updateCartItemDto.Unit ?? "шт"
+                Unit = cartItem.Unit
             };
         }
 
@@ -188,7 +237,7 @@ namespace TMKMiniApp.Services
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
                 TotalPrice = cartItem.TotalPrice,
-                Unit = updateCartItemDto.Unit ?? "шт"
+                Unit = cartItem.Unit
             };
         }
 

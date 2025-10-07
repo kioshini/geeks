@@ -21,6 +21,9 @@ namespace TMKMiniApp.Models
         [Required]
         public decimal Price { get; set; }
         
+        [Required]
+        public string Unit { get; set; } = "т";
+        
         public decimal TotalPrice => Price * Quantity;
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
