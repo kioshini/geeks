@@ -26,11 +26,12 @@ namespace TMKMiniApp.Services
                 cartItemDtos.Add(new CartItemDto
                 {
                     Id = item.Id,
-                    ProductId = item.ProductId,
+                    ProductId = item.ProductId.ToString(),
                     Product = product,
                     Quantity = item.Quantity,
                     Price = item.Price,
-                    TotalPrice = item.TotalPrice
+                    TotalPrice = item.TotalPrice,
+                    Unit = "шт" // Default unit for existing items
                 });
             }
 
@@ -45,7 +46,10 @@ namespace TMKMiniApp.Services
 
         public async Task<CartItemDto> AddToCartAsync(long userId, AddToCartDto addToCartDto)
         {
-            var product = await _productService.GetProductByIdAsync(addToCartDto.ProductId);
+            if (!int.TryParse(addToCartDto.ProductId, out int productId))
+                throw new ArgumentException("Неверный формат ID товара");
+                
+            var product = await _productService.GetProductByIdAsync(productId);
             if (product == null)
                 throw new ArgumentException("Товар не найден");
 
@@ -56,7 +60,7 @@ namespace TMKMiniApp.Services
                 throw new InvalidOperationException("Недостаточно товара на складе");
 
             // Проверяем, есть ли уже такой товар в корзине
-            var existingItem = _cartItems.FirstOrDefault(ci => ci.UserId == userId && ci.ProductId == addToCartDto.ProductId);
+            var existingItem = _cartItems.FirstOrDefault(ci => ci.UserId == userId && ci.ProductId == productId);
             
             if (existingItem != null)
             {
@@ -66,11 +70,12 @@ namespace TMKMiniApp.Services
                 return new CartItemDto
                 {
                     Id = existingItem.Id,
-                    ProductId = existingItem.ProductId,
+                    ProductId = existingItem.ProductId.ToString(),
                     Product = product,
                     Quantity = existingItem.Quantity,
                     Price = existingItem.Price,
-                    TotalPrice = existingItem.TotalPrice
+                    TotalPrice = existingItem.TotalPrice,
+                    Unit = addToCartDto.Unit ?? "шт"
                 };
             }
             else
@@ -79,7 +84,7 @@ namespace TMKMiniApp.Services
                 {
                     Id = _nextCartItemId++,
                     UserId = userId,
-                    ProductId = addToCartDto.ProductId,
+                    ProductId = productId,
                     Quantity = addToCartDto.Quantity,
                     Price = product.Price,
                     CreatedAt = DateTime.UtcNow,
@@ -91,11 +96,12 @@ namespace TMKMiniApp.Services
                 return new CartItemDto
                 {
                     Id = cartItem.Id,
-                    ProductId = cartItem.ProductId,
+                    ProductId = cartItem.ProductId.ToString(),
                     Product = product,
                     Quantity = cartItem.Quantity,
                     Price = cartItem.Price,
-                    TotalPrice = cartItem.TotalPrice
+                    TotalPrice = cartItem.TotalPrice,
+                    Unit = addToCartDto.Unit ?? "шт"
                 };
             }
         }
@@ -117,11 +123,12 @@ namespace TMKMiniApp.Services
             return new CartItemDto
             {
                 Id = cartItem.Id,
-                ProductId = cartItem.ProductId,
+                ProductId = cartItem.ProductId.ToString(),
                 Product = product,
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
-                TotalPrice = cartItem.TotalPrice
+                TotalPrice = cartItem.TotalPrice,
+                Unit = updateCartItemDto.Unit ?? "шт"
             };
         }
 
@@ -154,6 +161,47 @@ namespace TMKMiniApp.Services
         {
             var cartItem = _cartItems.FirstOrDefault(ci => ci.UserId == userId && ci.ProductId == productId);
             return await Task.FromResult(cartItem?.Id);
+        }
+
+        public async Task<CartItemDto?> UpdateCartItemByProductIdAsync(long userId, string productId, UpdateCartItemDto updateCartItemDto)
+        {
+            if (!int.TryParse(productId, out int productIdInt))
+                throw new ArgumentException("Неверный формат ID товара");
+                
+            var cartItem = _cartItems.FirstOrDefault(ci => ci.UserId == userId && ci.ProductId == productIdInt);
+            if (cartItem == null) return null;
+
+            var product = await _productService.GetProductByIdAsync(cartItem.ProductId);
+            if (product == null) return null;
+
+            if (updateCartItemDto.Quantity > product.StockQuantity)
+                throw new InvalidOperationException("Недостаточно товара на складе");
+
+            cartItem.Quantity = updateCartItemDto.Quantity;
+            cartItem.UpdatedAt = DateTime.UtcNow;
+
+            return new CartItemDto
+            {
+                Id = cartItem.Id,
+                ProductId = cartItem.ProductId.ToString(),
+                Product = product,
+                Quantity = cartItem.Quantity,
+                Price = cartItem.Price,
+                TotalPrice = cartItem.TotalPrice,
+                Unit = updateCartItemDto.Unit ?? "шт"
+            };
+        }
+
+        public async Task<bool> RemoveFromCartByProductIdAsync(long userId, string productId)
+        {
+            if (!int.TryParse(productId, out int productIdInt))
+                throw new ArgumentException("Неверный формат ID товара");
+                
+            var cartItem = _cartItems.FirstOrDefault(ci => ci.UserId == userId && ci.ProductId == productIdInt);
+            if (cartItem == null) return false;
+
+            _cartItems.Remove(cartItem);
+            return await Task.FromResult(true);
         }
     }
 }

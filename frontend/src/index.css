@@ -1,3 +1,14 @@
+/* CSS Variables */
+:root {
+  --primary: #f97316;
+  --primary-dark: #ea580c;
+  --dark: #1f2937;
+  --gray-dark: #374151;
+  --gray-medium: #6b7280;
+  --gray-light: #d1d5db;
+  --gray-lightest: #f9fafb;
+}
+
 /* Basic CSS Reset */
 * {
   box-sizing: border-box;
@@ -10,6 +21,35 @@ html, body, #root {
   font-family: 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
   overflow-y: auto;
+  /* Глобальный серый фон для всего приложения - исправляет проблему исчезновения цвета после ререндеров */
+  background-color: #F3F4F6;
+}
+
+/* Дополнительная защита от перезаписи фона - применяется ко всем элементам */
+* {
+  /* Убеждаемся, что фон не перезаписывается случайными стилями */
+  background-color: inherit;
+}
+
+/* Восстанавливаем белый фон для контентных блоков */
+.bg-white, .bg-white\/80 {
+  background-color: white !important;
+}
+
+/* Восстанавливаем прозрачный фон для элементов, которые должны быть прозрачными */
+.bg-transparent {
+  background-color: transparent !important;
+}
+
+/* Дополнительная защита для модальных окон и оверлеев */
+.modal-overlay, .backdrop-blur {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Обеспечиваем стабильность фона для всех страниц */
+.page-container, .main-content {
+  background-color: #F3F4F6 !important;
+  min-height: 100vh;
 }
 
 /* Touch-friendly interactions */
@@ -47,6 +87,23 @@ input[type="number"], input[type="text"] {
 .bg-gray-700 { background-color: #374151; }
 .bg-gray-800 { background-color: #1f2937; }
 .bg-gray-900 { background-color: #111827; }
+
+/* Custom color classes */
+.bg-primary { background-color: var(--primary); }
+.bg-primary-dark { background-color: var(--primary-dark); }
+.bg-dark { background-color: var(--dark); }
+.bg-grayDark { background-color: var(--gray-dark); }
+.bg-grayMedium { background-color: var(--gray-medium); }
+.bg-grayLight { background-color: var(--gray-light); }
+.bg-grayLightest { background-color: var(--gray-lightest); }
+
+.text-primary { color: var(--primary); }
+.text-primary-dark { color: var(--primary-dark); }
+.text-dark { color: var(--dark); }
+.text-grayDark { color: var(--gray-dark); }
+.text-grayMedium { color: var(--gray-medium); }
+.text-grayLight { color: var(--gray-light); }
+.text-grayLightest { color: var(--gray-lightest); }
 
 .bg-orange-100 { background-color: #fed7aa; }
 .bg-orange-200 { background-color: #fed7aa; }

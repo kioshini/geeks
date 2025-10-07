@@ -53,6 +53,23 @@ namespace TMKMiniApp.Controllers
         }
 
         /// <summary>
+        /// Загружает полную номенклатуру
+        /// </summary>
+        [HttpGet("nomenclature/full")]
+        public async Task<IActionResult> GetNomenclatureFull()
+        {
+            try
+            {
+                var nomenclature = await _jsonDataService.LoadNomenclatureAsync();
+                return Ok(nomenclature);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Загружает цены
         /// </summary>
         [HttpGet("prices")]
@@ -66,6 +83,23 @@ namespace TMKMiniApp.Controllers
                     count = prices.ArrayOfPricesEl?.Count ?? 0,
                     firstItem = prices.ArrayOfPricesEl?.FirstOrDefault()
                 });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Загружает полные цены
+        /// </summary>
+        [HttpGet("prices/full")]
+        public async Task<IActionResult> GetPricesFull()
+        {
+            try
+            {
+                var prices = await _jsonDataService.LoadPricesAsync();
+                return Ok(prices);
             }
             catch (Exception ex)
             {
@@ -95,6 +129,23 @@ namespace TMKMiniApp.Controllers
         }
 
         /// <summary>
+        /// Загружает полные остатки
+        /// </summary>
+        [HttpGet("remnants/full")]
+        public async Task<IActionResult> GetRemnantsFull()
+        {
+            try
+            {
+                var remnants = await _jsonDataService.LoadRemnantsAsync();
+                return Ok(remnants);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Загружает склады
         /// </summary>
         [HttpGet("stocks")]
@@ -116,6 +167,23 @@ namespace TMKMiniApp.Controllers
         }
 
         /// <summary>
+        /// Загружает полные склады
+        /// </summary>
+        [HttpGet("stocks/full")]
+        public async Task<IActionResult> GetStocksFull()
+        {
+            try
+            {
+                var stocks = await _jsonDataService.LoadStocksAsync();
+                return Ok(stocks);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Загружает типы
         /// </summary>
         [HttpGet("types")]
@@ -129,6 +197,23 @@ namespace TMKMiniApp.Controllers
                     count = types.ArrayOfTypeEl?.Count ?? 0,
                     firstItem = types.ArrayOfTypeEl?.FirstOrDefault()
                 });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Загружает полные типы
+        /// </summary>
+        [HttpGet("types/full")]
+        public async Task<IActionResult> GetTypesFull()
+        {
+            try
+            {
+                var types = await _jsonDataService.LoadTypesAsync();
+                return Ok(types);
             }
             catch (Exception ex)
             {

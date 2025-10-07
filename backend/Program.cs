@@ -4,11 +4,21 @@ using System.Threading.RateLimiting;
 using FluentValidation;
 using TMKMiniApp.Validators;
 using TMKMiniApp;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Configure form options for file uploads
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+    options.ValueLengthLimit = int.MaxValue;
+    options.ValueCountLimit = int.MaxValue;
+    options.KeyLengthLimit = int.MaxValue;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -70,6 +80,12 @@ builder.Services.AddSingleton<IDataSyncService, DataSyncService>();
 builder.Services.AddSingleton<JsonDataService>();
 builder.Services.AddScoped<TMKMiniApp.Validators.OrderRequestValidator>();
 
+// Register Delta Updates Service
+builder.Services.AddSingleton<IDynamicDeltaUpdatesService, DynamicDeltaUpdatesService>();
+
+// Register Automated Data Sync Service
+builder.Services.AddSingleton<IAutomatedDataSyncService, AutomatedDataSyncService>();
+
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductDtoValidator>();
 
@@ -120,6 +136,12 @@ app.Use(async (context, next) =>
 
 app.UseAuthorization();
 app.MapControllers();
+
+// Запуск сервиса динамических обновлений
+var deltaUpdatesService = app.Services.GetRequiredService<IDynamicDeltaUpdatesService>();
+await deltaUpdatesService.StartMonitoringAsync();
+
+// Автоматизированный сервис синхронизации запускается автоматически как IHostedService
 
 // Тест десериализации удален - используется API endpoint /api/jsondata/validate
 

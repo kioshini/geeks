@@ -1,0 +1,32 @@
+{
+  "ArrayOfPricesEl": [
+    {
+      "ID": "1",
+      "IDStock": "1",
+      "PriceT": 50000.0,
+      "PriceM": 25000.0,
+      "PriceLimitT1": 10.0,
+      "PriceT1": 45000.0,
+      "PriceLimitT2": 50.0,
+      "PriceT2": 40000.0,
+      "PriceLimitM1": 100.0,
+      "PriceM1": 22500.0,
+      "PriceLimitM2": 500.0,
+      "PriceM2": 20000.0
+    },
+    {
+      "ID": "2",
+      "IDStock": "1",
+      "PriceT": 60000.0,
+      "PriceM": 30000.0,
+      "PriceLimitT1": 5.0,
+      "PriceT1": 55000.0,
+      "PriceLimitT2": 25.0,
+      "PriceT2": 50000.0,
+      "PriceLimitM1": 50.0,
+      "PriceM1": 27500.0,
+      "PriceLimitM2": 250.0,
+      "PriceM2": 25000.0
+    }
+  ]
+}

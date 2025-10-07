@@ -34,22 +34,30 @@ export function AppLayout() {
 	}, []);
 
 	return (
-		<div className="min-h-screen bg-grayMedium flex flex-col">
-			<header className="bg-dark shadow-lg border-b border-grayDark sticky top-0 z-50">
+		<div className="min-h-screen bg-gray-100 flex flex-col">
+			<header className="bg-gray-800 shadow-lg border-b border-gray-700 sticky top-0 z-50">
 				<div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
 					<div className="flex items-center justify-between h-14 sm:h-16">
-						{/* Logo */}
-						<div className="flex items-center gap-2 sm:gap-4">
-							<div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm sm:text-lg">
+						{/* Logo - кликабельный для перехода в каталог */}
+						<Link 
+							to="/" 
+							className="flex items-center gap-2 sm:gap-4 hover:opacity-80 transition-opacity cursor-pointer"
+							onClick={() => {
+								// Сбрасываем фильтры при переходе в каталог
+								// Это будет обработано в компоненте Catalog
+								setIsMobileMenuOpen(false);
+							}}
+						>
+							<div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg">
 								T
 							</div>
 							<div>
 								<h1 className="text-lg sm:text-xl font-bold text-white">
-									<span className="text-[#E64A19]">T</span>MK Mini App
+									<span className="text-orange-500">T</span>MK Mini App
 								</h1>
-								<p className="text-xs sm:text-sm text-grayLight hidden sm:block">Steel Solutions</p>
+								<p className="text-xs sm:text-sm text-gray-300 hidden sm:block">Steel Solutions</p>
 							</div>
-						</div>
+						</Link>
 
 						{/* Desktop Navigation */}
 						<nav className="hidden md:flex items-center gap-2">
@@ -61,8 +69,8 @@ export function AppLayout() {
 							</Link>
 							<Link to="/cart" className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
 								location.pathname === '/cart'
-									? 'bg-primary text-white'
-									: 'text-grayLight hover:bg-grayDark hover:text-white'
+									? 'bg-orange-500 text-white'
+									: 'text-gray-300 hover:bg-gray-700 hover:text-white'
 							}`}>
 								<CartIcon 
 									totalItems={totalItems} 
@@ -80,7 +88,7 @@ export function AppLayout() {
 						{/* Mobile Menu Button */}
 						<button
 							onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-							className="md:hidden p-2 rounded-md text-grayLight hover:bg-grayDark transition-colors"
+							className="md:hidden p-2 rounded-md text-gray-300 hover:bg-gray-700 transition-colors"
 							aria-label="Открыть меню"
 						>
 							{isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -89,14 +97,14 @@ export function AppLayout() {
 
 					{/* Mobile Navigation */}
 					{isMobileMenuOpen && (
-						<div className="md:hidden border-t border-grayDark py-4">
+						<div className="md:hidden border-t border-gray-700 py-4">
 							<div className="flex flex-col space-y-2">
 								<Link 
 									to="/" 
 									className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
 										location.pathname === '/'
-											? 'bg-primary text-white'
-											: 'text-grayLight hover:bg-grayDark'
+											? 'bg-orange-500 text-white'
+											: 'text-gray-300 hover:bg-gray-700'
 									}`}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
@@ -109,8 +117,8 @@ export function AppLayout() {
 									to="/cart" 
 									className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
 										location.pathname === '/cart'
-											? 'bg-primary text-white'
-											: 'text-grayLight hover:bg-grayDark'
+											? 'bg-orange-500 text-white'
+											: 'text-gray-300 hover:bg-gray-700'
 									}`}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
@@ -123,8 +131,8 @@ export function AppLayout() {
 									to="/checkout" 
 									className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
 										location.pathname === '/checkout'
-											? 'bg-primary text-white'
-											: 'text-grayLight hover:bg-grayDark'
+											? 'bg-orange-500 text-white'
+											: 'text-gray-300 hover:bg-gray-700'
 									}`}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
@@ -136,7 +144,7 @@ export function AppLayout() {
 							</div>
 							
 							{/* Mobile Unit Toggle */}
-							<div className="mt-4 pt-4 border-t border-grayDark">
+							<div className="mt-4 pt-4 border-t border-gray-700">
 								<UnitToggle
 									selectedUnit={selectedUnit}
 									onUnitChange={setSelectedUnit}
@@ -157,7 +165,7 @@ export function AppLayout() {
 function navLinkCls(active: boolean) {
 	return `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
 		active
-			? 'bg-primary text-white'
-			: 'text-grayLight hover:bg-grayDark hover:text-white'
+			? 'bg-orange-500 text-white'
+			: 'text-gray-300 hover:bg-gray-700 hover:text-white'
 	}`
 }

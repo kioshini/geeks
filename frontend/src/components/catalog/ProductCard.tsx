@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Minus, ShoppingCart, MapPin } from 'lucide-react';
 import type { ProductCardProps } from '../../types/catalog';
 import { useUnit } from '../../contexts/UnitContext';
@@ -30,8 +30,14 @@ export function ProductCard({
   };
 
   const handleAddToCart = () => {
-    onAddToCart(product, quantity);
-    setQuantity(1);
+    console.log('Добавление в корзину:', { product: product.name, quantity, productId: product.id });
+    try {
+      onAddToCart(product, quantity);
+      setQuantity(1);
+      console.log('Товар успешно добавлен в корзину');
+    } catch (error) {
+      console.error('Ошибка при добавлении в корзину:', error);
+    }
   };
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -55,10 +61,10 @@ export function ProductCard({
   const isInCart = cartQuantity > 0;
   const isInStock = product.inStockT > 0 || product.inStockM > 0;
 
-  // Стили для разных режимов отображения
+  // Стили для разных режимов отображения - используем белый фон для карточек товаров для контраста с серым фоном приложения
   const cardClasses = viewMode === 'grid' 
-    ? "bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer overflow-hidden border border-grayLight hover:border-primary/30"
-    : "bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer overflow-hidden border border-grayLight hover:border-primary/30 flex";
+    ? "bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer overflow-hidden border border-gray-300 hover:border-orange-500/30"
+    : "bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer overflow-hidden border border-gray-300 hover:border-orange-500/30 flex";
 
   const contentClasses = viewMode === 'grid'
     ? "p-2 sm:p-4"
@@ -83,7 +89,7 @@ export function ProductCard({
         {/* Название и основные характеристики */}
         <div className="mb-2 sm:mb-3">
           <div className="flex items-center justify-between mb-1 sm:mb-2">
-            <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/10 text-primary text-xs font-semibold rounded">
+            <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-orange-100 text-orange-600 text-xs font-semibold rounded">
               {product.productionType}
             </span>
             {!isInStock && (
@@ -126,7 +132,7 @@ export function ProductCard({
                 </span>
               )}
               {product.inStockM > 0 && (
-                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/10 text-primary rounded text-xs">
+                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-orange-100 text-orange-600 rounded text-xs">
                   {product.inStockM.toFixed(1)} м
                 </span>
               )}
@@ -173,7 +179,7 @@ export function ProductCard({
                     e.stopPropagation();
                     handleDecrement();
                   }}
-                  className="w-10 h-10 sm:w-8 sm:h-8 bg-grayLight hover:bg-grayDark hover:text-white rounded-full flex items-center justify-center transition-colors touch-manipulation"
+                  className="w-10 h-10 sm:w-8 sm:h-8 bg-gray-300 hover:bg-gray-600 hover:text-white rounded-full flex items-center justify-center transition-colors touch-manipulation"
                   disabled={quantity <= 1}
                 >
                   <Minus className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -184,7 +190,7 @@ export function ProductCard({
                   value={quantity}
                   onChange={handleInputChange}
                   onClick={(e) => e.stopPropagation()}
-                  className="w-16 sm:w-16 text-center border border-[#DEE1E6] rounded-md px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
+                  className="w-16 sm:w-16 text-center border border-[#DEE1E6] rounded-md px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 touch-manipulation"
                   min="1"
                   max="999"
                 />
@@ -194,7 +200,7 @@ export function ProductCard({
                     e.stopPropagation();
                     handleIncrement();
                   }}
-                  className="w-10 h-10 sm:w-8 sm:h-8 bg-grayLight hover:bg-grayDark hover:text-white rounded-full flex items-center justify-center transition-colors touch-manipulation"
+                  className="w-10 h-10 sm:w-8 sm:h-8 bg-gray-300 hover:bg-gray-600 hover:text-white rounded-full flex items-center justify-center transition-colors touch-manipulation"
                 >
                   <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
                 </button>
@@ -206,18 +212,22 @@ export function ProductCard({
                   handleAddToCart();
                 }}
                 disabled={!isInStock}
-                className="w-full bg-[#171A1F] hover:bg-[#1F1A1F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 sm:py-2 px-4 rounded-md transition flex items-center justify-center gap-2 touch-manipulation"
+                className={`w-full py-3 sm:py-2 px-4 rounded-md transition flex items-center justify-center gap-2 touch-manipulation font-semibold ${
+                  isInStock 
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 <ShoppingCart className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="text-sm sm:text-base">{isInStock ? 'Добавить в корзину' : 'Нет в наличии'}</span>
+                <span className="text-sm sm:text-base" style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>{isInStock ? 'Добавить в корзину' : 'Нет в наличии'}</span>
               </button>
             </div>
           ) : (
             // Управление количеством в корзине
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-grayDark">В корзине:</span>
-                <span className="font-semibold text-primary">{cartQuantity} шт.</span>
+                <span className="text-sm text-gray-700">В корзине:</span>
+                <span className="font-semibold text-orange-500">{cartQuantity} шт.</span>
               </div>
               
               <div className="flex items-center space-x-1 sm:space-x-2">
@@ -239,7 +249,7 @@ export function ProductCard({
                     onUpdateQuantity(product.id, Math.max(1, Math.min(999, value)));
                   }}
                   onClick={(e) => e.stopPropagation()}
-                  className="w-16 text-center border border-[#DEE1E6] rounded-md px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
+                  className="w-16 text-center border border-[#DEE1E6] rounded-md px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 touch-manipulation"
                   min="1"
                   max="999"
                 />
@@ -260,9 +270,9 @@ export function ProductCard({
                   e.stopPropagation();
                   onRemoveFromCart(product.id);
                 }}
-                className="w-full bg-[#F44336] hover:bg-red-600 text-white font-medium py-3 sm:py-2 px-4 rounded-md transition touch-manipulation"
+                className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 sm:py-2 px-4 rounded-md transition touch-manipulation"
               >
-                <span className="text-sm sm:text-base">Убрать из корзины</span>
+                <span className="text-sm sm:text-base" style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>Убрать из корзины</span>
               </button>
             </div>
           )}

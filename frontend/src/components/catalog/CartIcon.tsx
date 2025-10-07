@@ -16,7 +16,7 @@ export function CartIcon({ totalItems }: CartIconProps) {
       
       {/* Счетчик товаров справа от текста */}
       {totalItems > 0 && (
-        <span className="bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+        <span className="bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-10 flex items-center justify-center min-w-[20px]">
           {totalItems > 99 ? '99+' : totalItems}
         </span>
       )}

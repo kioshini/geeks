@@ -116,11 +116,11 @@ export function ProductModal({
             className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-2 sm:mx-4"
           >
             {/* Заголовок модалки */}
-            <div className="flex items-center justify-between p-3 sm:p-6 border-b border-grayLight">
+            <div className="flex items-center justify-between p-3 sm:p-6 border-b border-gray-300">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#171A1F]">Информация о товаре</h2>
               <button
                 onClick={onClose}
-                className="text-grayDark hover:text-dark transition-colors p-2 hover:bg-grayLight rounded-full"
+                className="text-gray-700 hover:text-gray-900 transition-colors p-2 hover:bg-gray-300 rounded-full"
                 aria-label="Закрыть модальное окно"
               >
                 <X className="w-6 h-6" />
@@ -135,7 +135,7 @@ export function ProductModal({
                   {/* Информация о товаре */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded">
+                      <span className="px-3 py-1 bg-orange-100 text-orange-600 text-sm font-semibold rounded">
                         {product.productionType}
                       </span>
                       {!isInStock && (
@@ -159,7 +159,7 @@ export function ProductModal({
                     </div>
 
                     {/* Цены */}
-                    <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
                       <h4 className="text-lg font-semibold text-[#171A1F] mb-3">Цены</h4>
                       <div className="space-y-2">
                         {selectedUnit === 'т' ? (
@@ -308,7 +308,7 @@ export function ProductModal({
                   </div>
 
                   {/* Управление корзиной */}
-                  <div className="border-t border-grayLight pt-6">
+                  <div className="border-t border-gray-300 pt-6">
                     <h4 className="text-lg font-semibold text-[#171A1F] mb-4">Добавить в корзину</h4>
                     
                     {!isInCart ? (
@@ -319,7 +319,7 @@ export function ProductModal({
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={handleDecrement}
-                              className="w-10 h-10 bg-grayLight hover:bg-grayDark hover:text-white rounded-full flex items-center justify-center transition-colors"
+                              className="w-10 h-10 bg-gray-300 hover:bg-gray-600 hover:text-white rounded-full flex items-center justify-center transition-colors"
                               disabled={quantity <= 1}
                             >
                               <Minus className="w-5 h-5" />
@@ -329,14 +329,14 @@ export function ProductModal({
                               type="number"
                               value={quantity}
                               onChange={handleInputChange}
-                              className="w-20 text-center border border-[#DEE1E6] rounded-md px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                              className="w-20 text-center border border-[#DEE1E6] rounded-md px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                               min="1"
                               max="999"
                             />
                             
                             <button
                               onClick={handleIncrement}
-                              className="w-10 h-10 bg-grayLight hover:bg-grayDark hover:text-white rounded-full flex items-center justify-center transition-colors"
+                              className="w-10 h-10 bg-gray-300 hover:bg-gray-600 hover:text-white rounded-full flex items-center justify-center transition-colors"
                             >
                               <Plus className="w-5 h-5" />
                             </button>
@@ -377,7 +377,7 @@ export function ProductModal({
                                 const value = parseInt(e.target.value) || 1;
                                 onUpdateQuantity(product.id, Math.max(1, Math.min(999, value)));
                               }}
-                              className="w-20 text-center border border-[#DEE1E6] rounded-md px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
+                              className="w-20 text-center border border-[#DEE1E6] rounded-md px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 touch-manipulation"
                               min="1"
                               max="999"
                             />

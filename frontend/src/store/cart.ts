@@ -12,9 +12,9 @@ export type CartState = {
 	loadCart: () => Promise<void>;
 	add: (dto: AddToCartDto) => Promise<void>;
 	update: (itemId: number, dto: UpdateCartItemDto) => Promise<void>;
-	updateByProductId: (productId: number, dto: UpdateCartItemDto) => Promise<void>;
+	updateByProductId: (productId: string, dto: UpdateCartItemDto) => Promise<void>;
 	remove: (itemId: number) => Promise<void>;
-	removeByProductId: (productId: number) => Promise<void>;
+	removeByProductId: (productId: string) => Promise<void>;
 	clear: () => Promise<void>;
 };
 
@@ -67,7 +67,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 		}
 	},
 
-	updateByProductId: async (productId: number, dto: UpdateCartItemDto) => {
+	updateByProductId: async (productId: string, dto: UpdateCartItemDto) => {
 		const userId = get().userId;
 		if (!userId) return;
 		set({ loading: true, error: undefined });
@@ -95,7 +95,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 		}
 	},
 
-	removeByProductId: async (productId: number) => {
+	removeByProductId: async (productId: string) => {
 		const userId = get().userId;
 		if (!userId) return;
 		set({ loading: true, error: undefined });

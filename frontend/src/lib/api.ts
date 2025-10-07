@@ -12,7 +12,7 @@ const api = axios.create({
 	},
 });
 
-// Types
+// Types for new backend integration
 export type ProductDto = {
 	id: number;
 	name: string;
@@ -39,6 +39,101 @@ export type ProductDto = {
 	hasMaterialDiscount: boolean;
 };
 
+// New types for JSON data integration
+export type NomenclatureEl = {
+	ID: string;
+	IDCat: string;
+	IDType: string;
+	IDTypeNew: string;
+	ProductionType: string;
+	IDFunctionType: string;
+	Name: string;
+	Gost: string;
+	FormOfLength: string;
+	Manufacturer: string;
+	SteelGrade: string;
+	Diameter: number;
+	ProfileSize2: number;
+	PipeWallThickness: number;
+	Status: number;
+	Koef: number;
+};
+
+export type PricesEl = {
+	ID: string;
+	IDStock: string;
+	PriceT: number;
+	PriceLimitT1: number;
+	PriceT1: number;
+	PriceLimitT2: number;
+	PriceT2: number;
+	PriceM: number;
+	PriceLimitM1: number;
+	PriceM1: number;
+	PriceLimitM2: number;
+	PriceM2: number;
+	NDS: number;
+};
+
+export type RemnantsEl = {
+	ID: string;
+	IDStock: string;
+	InStockT: number;
+	InStockM: number;
+	SoonArriveT: number;
+	SoonArriveM: number;
+	ReservedT: number;
+	ReservedM: number;
+	UnderTheOrder: boolean;
+	AvgTubeLength: number;
+	AvgTubeWeight: number;
+};
+
+export type StockEl = {
+	IDStock: string;
+	Stock: string;
+	StockName: string;
+	Address: string;
+	Schedule: string;
+	IDDivision: string;
+	CashPayment: boolean;
+	CardPayment: boolean;
+	FIASId: string;
+	OwnerInn: string;
+	OwnerKpp: string;
+	OwnerFullName: string;
+	OwnerShortName: string;
+	RailwayStation: string;
+	ConsigneeCode: string;
+};
+
+export type TypeEl = {
+	IDType: string;
+	Type: string;
+	IDParentType: string;
+};
+
+// Root types for JSON deserialization
+export type NomenclatureRoot = {
+	ArrayOfNomenclatureEl: NomenclatureEl[];
+};
+
+export type PricesRoot = {
+	ArrayOfPricesEl: PricesEl[];
+};
+
+export type RemnantsRoot = {
+	ArrayOfRemnantsEl: RemnantsEl[];
+};
+
+export type StocksRoot = {
+	ArrayOfStockEl: StockEl[];
+};
+
+export type TypesRoot = {
+	ArrayOfTypeEl: TypeEl[];
+};
+
 export type ProductType = {
 	id: number;
 	name: string;
@@ -47,13 +142,14 @@ export type ProductType = {
 	isActive: boolean;
 };
 
-export type AddToCartDto = { productId: number; quantity: number };
-export type UpdateCartItemDto = { quantity: number };
+export type AddToCartDto = { productId: string; quantity: number; unit?: string };
+export type UpdateCartItemDto = { quantity: number; unit?: string };
 export type CartItemDto = {
 	id: number;
-	productId: number;
+	productId: string;
 	product?: ProductDto;
 	quantity: number;
+	unit: string;
 	price: number;
 	totalPrice: number;
 };
@@ -74,6 +170,20 @@ export type CreateOrderDto = {
 	email?: string;
 	items: CreateOrderItemDto[];
 	notes?: string;
+};
+
+export type OrderRequest = {
+	firstName: string;
+	lastName: string;
+	inn: string;
+	phone: string;
+	email: string;
+	orderedItems: Array<{
+		productId: string;
+		quantity: number;
+		unit: string;
+		unitPrice: number;
+	}>;
 };
 export type OrderDto = {
 	id: number;
@@ -159,7 +269,7 @@ export const Api = {
 	 * @param body - Updated item data
 	 * @returns Promise resolving to updated cart item
 	 */
-	updateCartItemByProductId: async (userId: number, productId: number, body: UpdateCartItemDto) => (await api.put<CartItemDto>(`/api/cart/${userId}/items/product/${productId}`, body)).data,
+	updateCartItemByProductId: async (userId: number, productId: string, body: UpdateCartItemDto) => (await api.put<CartItemDto>(`/api/cart/${userId}/items/product/${productId}`, body)).data,
 	
 	/**
 	 * Remove item from cart
@@ -175,7 +285,7 @@ export const Api = {
 	 * @param productId - Product ID
 	 * @returns Promise resolving when item is removed
 	 */
-	removeFromCartByProductId: async (userId: number, productId: number) => (await api.delete<void>(`/api/cart/${userId}/items/product/${productId}`)).data,
+	removeFromCartByProductId: async (userId: number, productId: string) => (await api.delete<void>(`/api/cart/${userId}/items/product/${productId}`)).data,
 	
 	/**
 	 * Clear entire cart for user
@@ -198,4 +308,131 @@ export const Api = {
 	 * @returns Promise resolving to array of orders
 	 */
 	getUserOrders: async (userId: number) => (await api.get<OrderDto[]>(`/api/orders/user/${userId}`)).data,
+
+	// New methods for JSON data integration
+	/**
+	 * Get nomenclature data from JSON
+	 * @returns Promise resolving to nomenclature data
+	 */
+	getNomenclature: async () => {
+		const response = await api.get('/api/jsondata/nomenclature');
+		// API возвращает обернутые данные, нужно извлечь массив
+		const data = response.data;
+		if (data && data.firstItem) {
+			// Если есть firstItem, значит это обернутый ответ
+			// Нужно получить полные данные из JsonDataService
+			const fullResponse = await api.get('/api/jsondata/nomenclature/full');
+			return fullResponse.data;
+		}
+		return data;
+	},
+
+	/**
+	 * Get prices data from JSON
+	 * @returns Promise resolving to prices data
+	 */
+	getPrices: async () => {
+		const response = await api.get('/api/jsondata/prices');
+		const data = response.data;
+		if (data && data.firstItem) {
+			const fullResponse = await api.get('/api/jsondata/prices/full');
+			return fullResponse.data;
+		}
+		return data;
+	},
+
+	/**
+	 * Get remnants data from JSON
+	 * @returns Promise resolving to remnants data
+	 */
+	getRemnants: async () => {
+		const response = await api.get('/api/jsondata/remnants');
+		const data = response.data;
+		if (data && data.firstItem) {
+			const fullResponse = await api.get('/api/jsondata/remnants/full');
+			return fullResponse.data;
+		}
+		return data;
+	},
+
+	/**
+	 * Get stocks data from JSON
+	 * @returns Promise resolving to stocks data
+	 */
+	getStocks: async () => {
+		const response = await api.get('/api/jsondata/stocks');
+		const data = response.data;
+		if (data && data.firstItem) {
+			const fullResponse = await api.get('/api/jsondata/stocks/full');
+			return fullResponse.data;
+		}
+		return data;
+	},
+
+	/**
+	 * Get types data from JSON
+	 * @returns Promise resolving to types data
+	 */
+	getTypes: async () => {
+		const response = await api.get('/api/jsondata/types');
+		const data = response.data;
+		if (data && data.firstItem) {
+			const fullResponse = await api.get('/api/jsondata/types/full');
+			return fullResponse.data;
+		}
+		return data;
+	},
+
+	/**
+	 * Validate JSON data integrity
+	 * @returns Promise resolving to validation result
+	 */
+	validateJsonData: async () => (await api.get<{isValid: boolean, errors: string[]}>('/api/jsondata/validate')).data,
+
+	// Delta updates methods
+	/**
+	 * Test price delta calculation
+	 * @param currentValue - Current price value
+	 * @param delta - Delta to apply
+	 * @returns Promise resolving to calculation result
+	 */
+	testPriceDelta: async (currentValue: number, delta: number) => 
+		(await api.post<{currentValue: number, delta: number, newValue: number, message: string}>('/api/deltaupdates/test-price-delta', {currentValue, delta})).data,
+
+	/**
+	 * Test stock delta calculation
+	 * @param currentValue - Current stock value
+	 * @param delta - Delta to apply
+	 * @returns Promise resolving to calculation result
+	 */
+	testStockDelta: async (currentValue: number, delta: number) => 
+		(await api.post<{currentValue: number, delta: number, newValue: number, message: string}>('/api/deltaupdates/test-stock-delta', {currentValue, delta})).data,
+
+	/**
+	 * Process prices delta file manually
+	 * @param filePath - Path to prices delta file
+	 * @returns Promise resolving to processing result
+	 */
+	processPricesFile: async (filePath: string) => 
+		(await api.post<{message: string}>('/api/deltaupdates/process-prices-file', {filePath})).data,
+
+	/**
+	 * Process remnants delta file manually
+	 * @param filePath - Path to remnants delta file
+	 * @returns Promise resolving to processing result
+	 */
+	processRemnantsFile: async (filePath: string) => 
+		(await api.post<{message: string}>('/api/deltaupdates/process-remnants-file', {filePath})).data,
+
+	/**
+	 * Start delta updates monitoring
+	 * @returns Promise resolving to monitoring status
+	 */
+	startDeltaMonitoring: async () => (await api.post<{message: string}>('/api/deltaupdates/start-monitoring')).data,
+
+	/**
+	 * Stop delta updates monitoring
+	 * @returns Promise resolving to monitoring status
+	 */
+	stopDeltaMonitoring: async () => (await api.post<{message: string}>('/api/deltaupdates/stop-monitoring')).data,
 };

@@ -1,0 +1,30 @@
+{
+  "ArrayOfRemnantsEl": [
+    {
+      "ID": "1",
+      "IDStock": "1",
+      "InStockT": 50.0,
+      "InStockM": 40.0,
+      "SoonArriveT": 0,
+      "SoonArriveM": 0,
+      "ReservedT": 0,
+      "ReservedM": 0,
+      "UnderTheOrder": false,
+      "AvgTubeLength": 0,
+      "AvgTubeWeight": 0
+    },
+    {
+      "ID": "2",
+      "IDStock": "1",
+      "InStockT": -10.0,
+      "InStockM": -8.0,
+      "SoonArriveT": 0,
+      "SoonArriveM": 0,
+      "ReservedT": 0,
+      "ReservedM": 0,
+      "UnderTheOrder": false,
+      "AvgTubeLength": 0,
+      "AvgTubeWeight": 0
+    }
+  ]
+}

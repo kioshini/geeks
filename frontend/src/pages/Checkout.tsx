@@ -1,6 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react';
-import { Api } from '../lib/api';
-import type { CreateOrderDto } from '../lib/api';
+import type { OrderRequest } from '../lib/api';
 import { useCartStore } from '../store/cart';
 import { Telegram } from '../lib/telegram';
 
@@ -8,12 +7,14 @@ export function CheckoutPage() {
 	const { cart, userId, setUserId, loadCart } = useCartStore();
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
+	const [inn, setInn] = useState('');
 	const [phone, setPhone] = useState('');
 	const [email, setEmail] = useState('');
 	const [notes, setNotes] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 	const [human, setHuman] = useState(false);
+	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	useEffect(() => {
 		const u = Telegram.user();
@@ -23,30 +24,100 @@ export function CheckoutPage() {
 		loadCart();
 	}, [setUserId, loadCart]);
 
+	// Валидация полей
+	const validateForm = () => {
+		const newErrors: Record<string, string> = {};
+
+		if (!firstName.trim()) {
+			newErrors.firstName = 'Имя обязательно';
+		} else if (firstName.trim().length < 2) {
+			newErrors.firstName = 'Имя должно содержать минимум 2 символа';
+		}
+
+		if (!lastName.trim()) {
+			newErrors.lastName = 'Фамилия обязательна';
+		} else if (lastName.trim().length < 2) {
+			newErrors.lastName = 'Фамилия должна содержать минимум 2 символа';
+		}
+
+		if (!inn.trim()) {
+			newErrors.inn = 'ИНН обязателен';
+		} else if (!/^\d{10}$|^\d{12}$/.test(inn.trim())) {
+			newErrors.inn = 'ИНН должен содержать 10 или 12 цифр';
+		}
+
+		if (!phone.trim()) {
+			newErrors.phone = 'Телефон обязателен';
+		} else if (!/^(\+7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/.test(phone.trim())) {
+			newErrors.phone = 'Неверный формат телефона';
+		}
+
+		if (!email.trim()) {
+			newErrors.email = 'Email обязателен';
+		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+			newErrors.email = 'Неверный формат email';
+		}
+
+		if (!human) {
+			newErrors.human = 'Подтвердите, что вы не робот';
+		}
+
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
+
 	async function onSubmit(e: FormEvent) {
 		e.preventDefault();
 		if (!cart || !userId) return;
-		setLoading(true);
+		
+		// Очищаем предыдущие ошибки
+		setErrors({});
 		setMessage(null);
+
+		// Валидируем форму
+		if (!validateForm()) {
+			setMessage('Пожалуйста, исправьте ошибки в форме');
+			return;
+		}
+
+		setLoading(true);
 		try {
-			const body: CreateOrderDto = {
-				userId,
-				firstName: firstName || 'Пользователь',
-				lastName: lastName || '',
-				phone: phone || 'N/A',
-				email: email || undefined,
-				items: cart.items.map(i => ({ productId: i.productId, quantity: i.quantity })),
-				notes: notes || undefined,
+			// Используем новый API для создания заказа
+			const orderRequest: OrderRequest = {
+				firstName: firstName.trim(),
+				lastName: lastName.trim(),
+				inn: inn.trim(),
+				phone: phone.trim(),
+				email: email.trim(),
+				orderedItems: cart.items.map(i => ({
+					productId: i.productId.toString(),
+					quantity: i.quantity,
+					unit: 'шт', // По умолчанию штуки
+					unitPrice: i.product?.price || 0
+				}))
 			};
-			if (!human) {
-				setMessage('Подтвердите, что вы не робот');
-				return;
+
+			// Отправляем заказ через новый API
+			const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/orders`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(orderRequest)
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || 'Ошибка при создании заказа');
 			}
-			const nonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
-			const order = await Api.createOrder(body, nonce);
+
+			const order = await response.json();
 			setMessage(`Заказ #${order.id} создан на сумму ${order.totalPrice.toFixed(2)} ₽`);
+			
+			// Очищаем корзину после успешного заказа
+			// cart.clear(); // Если есть метод очистки корзины
 		} catch (e: any) {
-			setMessage(e?.response?.data || e?.message || 'Ошибка при оформлении заказа');
+			setMessage(e?.message || 'Ошибка при оформлении заказа');
 		} finally {
 			setLoading(false);
 		}
@@ -138,18 +209,44 @@ export function CheckoutPage() {
 								onChange={e => setFirstName(e.target.value)} 
 								placeholder="Введите имя" 
 								required
-								className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+								className={`w-full px-4 py-3 border-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+									errors.firstName ? 'border-red-500' : 'border-gray-300'
+								}`}
 							/>
+							{errors.firstName && (
+								<p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+							)}
 						</div>
 						<div>
-							<label className="block text-sm font-bold text-gray-700 mb-2">Фамилия</label>
+							<label className="block text-sm font-bold text-gray-700 mb-2">Фамилия *</label>
 							<input 
 								value={lastName} 
 								onChange={e => setLastName(e.target.value)} 
 								placeholder="Введите фамилию" 
-								className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+								required
+								className={`w-full px-4 py-3 border-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+									errors.lastName ? 'border-red-500' : 'border-gray-300'
+								}`}
 							/>
+							{errors.lastName && (
+								<p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+							)}
 						</div>
+					</div>
+					<div className="mt-6">
+						<label className="block text-sm font-bold text-gray-700 mb-2">ИНН *</label>
+						<input 
+							value={inn} 
+							onChange={e => setInn(e.target.value)} 
+							placeholder="1234567890 или 123456789012" 
+							required
+							className={`w-full px-4 py-3 border-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+								errors.inn ? 'border-red-500' : 'border-gray-300'
+							}`}
+						/>
+						{errors.inn && (
+							<p className="mt-1 text-sm text-red-600">{errors.inn}</p>
+						)}
 					</div>
 					<div className="mt-6">
 						<label className="block text-sm font-bold text-gray-700 mb-2">Телефон *</label>
@@ -158,18 +255,29 @@ export function CheckoutPage() {
 							onChange={e => setPhone(e.target.value)} 
 							placeholder="+7 (999) 123-45-67" 
 							required
-							className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+							className={`w-full px-4 py-3 border-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+								errors.phone ? 'border-red-500' : 'border-gray-300'
+							}`}
 						/>
+						{errors.phone && (
+							<p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+						)}
 					</div>
 					<div className="mt-6">
-						<label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+						<label className="block text-sm font-bold text-gray-700 mb-2">Email *</label>
 						<input 
 							value={email} 
 							onChange={e => setEmail(e.target.value)} 
 							placeholder="example@email.com" 
 							type="email"
-							className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+							required
+							className={`w-full px-4 py-3 border-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+								errors.email ? 'border-red-500' : 'border-gray-300'
+							}`}
 						/>
+						{errors.email && (
+							<p className="mt-1 text-sm text-red-600">{errors.email}</p>
+						)}
 					</div>
 				</div>
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Grid, List, Search, Filter, X } from 'lucide-react';
 import type { CatalogProps, Product, ViewMode } from '../../types/catalog';
@@ -17,7 +17,8 @@ export function Catalog({
   onAddToCart,
   onRemoveFromCart,
   onUpdateQuantity,
-  cartItems
+  cartItems,
+  resetFiltersTrigger = 0
 }: CatalogProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -26,7 +27,31 @@ export function Catalog({
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>('');
   const [selectedSteelGrade, setSelectedSteelGrade] = useState<string>('');
+  const [selectedStock, setSelectedStock] = useState<string>('');
+  const [selectedDiameter, setSelectedDiameter] = useState<string>('');
+  const [selectedThickness, setSelectedThickness] = useState<string>('');
+  const [selectedGost, setSelectedGost] = useState<string>('');
   const { selectedUnit, setSelectedUnit } = useUnit();
+
+  // Функция для сброса всех фильтров
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('');
+    setSelectedManufacturer('');
+    setSelectedSteelGrade('');
+    setSelectedStock('');
+    setSelectedDiameter('');
+    setSelectedThickness('');
+    setSelectedGost('');
+  };
+
+  // Сбрасываем фильтры при изменении списка продуктов или при срабатывании триггера
+  useEffect(() => {
+    // Сбрасываем фильтры только если продукты изменились и не пустые
+    if (products.length > 0) {
+      resetFilters();
+    }
+  }, [products.length, resetFiltersTrigger]); // Срабатывает при изменении количества продуктов или триггера
 
   // Получаем уникальные категории, производителей и марки стали для фильтрации
   const categories = useMemo(() => {
@@ -44,6 +69,26 @@ export function Catalog({
     return uniqueSteelGrades.sort();
   }, [products]);
 
+  const stocks = useMemo(() => {
+    const uniqueStocks = Array.from(new Set(products.map(p => p.stockName).filter(Boolean)));
+    return uniqueStocks.sort();
+  }, [products]);
+
+  const diameters = useMemo(() => {
+    const uniqueDiameters = Array.from(new Set(products.map(p => p.diameter).filter(d => d > 0)));
+    return uniqueDiameters.sort((a, b) => a - b);
+  }, [products]);
+
+  const thicknesses = useMemo(() => {
+    const uniqueThicknesses = Array.from(new Set(products.map(p => p.pipeWallThickness).filter(t => t > 0)));
+    return uniqueThicknesses.sort((a, b) => a - b);
+  }, [products]);
+
+  const gosts = useMemo(() => {
+    const uniqueGosts = Array.from(new Set(products.map(p => p.gost).filter(Boolean)));
+    return uniqueGosts.sort();
+  }, [products]);
+
   // Фильтруем товары по поисковому запросу и фильтрам
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
@@ -56,10 +101,15 @@ export function Catalog({
       const matchesCategory = !selectedCategory || product.productionType === selectedCategory;
       const matchesManufacturer = !selectedManufacturer || product.manufacturer === selectedManufacturer;
       const matchesSteelGrade = !selectedSteelGrade || product.steelGrade === selectedSteelGrade;
+      const matchesStock = !selectedStock || product.stockName === selectedStock;
+      const matchesDiameter = !selectedDiameter || product.diameter === parseFloat(selectedDiameter);
+      const matchesThickness = !selectedThickness || product.pipeWallThickness === parseFloat(selectedThickness);
+      const matchesGost = !selectedGost || product.gost === selectedGost;
       
-      return matchesSearch && matchesCategory && matchesManufacturer && matchesSteelGrade;
+      return matchesSearch && matchesCategory && matchesManufacturer && matchesSteelGrade && 
+             matchesStock && matchesDiameter && matchesThickness && matchesGost;
     });
-  }, [products, searchQuery, selectedCategory, selectedManufacturer, selectedSteelGrade]);
+  }, [products, searchQuery, selectedCategory, selectedManufacturer, selectedSteelGrade, selectedStock, selectedDiameter, selectedThickness, selectedGost]);
 
 
   // Получаем количество конкретного товара в корзине
@@ -84,13 +134,11 @@ export function Catalog({
   };
 
   const handleClearFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('');
-    setSelectedManufacturer('');
-    setSelectedSteelGrade('');
+    resetFilters();
   };
 
-  const hasActiveFilters = searchQuery || selectedCategory || selectedManufacturer || selectedSteelGrade;
+  const hasActiveFilters = searchQuery || selectedCategory || selectedManufacturer || selectedSteelGrade || 
+                          selectedStock || selectedDiameter || selectedThickness || selectedGost;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,7 +151,7 @@ export function Catalog({
         </p>
 
         {/* Панель управления - поиск и фильтры в одну строку */}
-        <div className="bg-white rounded-lg shadow-lg border border-grayLight p-2 sm:p-4 mb-4 sm:mb-6">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-300 p-2 sm:p-4 mb-4 sm:mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             {/* Поиск */}
             <div className="relative flex-1 max-w-md">
@@ -173,6 +221,74 @@ export function Catalog({
                     </select>
                   </div>
                 )}
+
+                {/* Фильтр по складам */}
+                {stocks.length > 0 && (
+                  <div className="min-w-[150px]">
+                    <label className="block text-xs sm:text-sm font-medium text-[#171A1F] mb-1 sm:mb-2">Склад</label>
+                    <select
+                      value={selectedStock}
+                      onChange={(e) => setSelectedStock(e.target.value)}
+                      className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-[#DEE1E6] rounded-md focus:outline-none focus:ring-1 focus:ring-[#171A1F]"
+                    >
+                      <option value="">Все склады</option>
+                      {stocks.map(stock => (
+                        <option key={stock} value={stock}>{stock}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Фильтр по диаметру */}
+                {diameters.length > 0 && (
+                  <div className="min-w-[150px]">
+                    <label className="block text-xs sm:text-sm font-medium text-[#171A1F] mb-1 sm:mb-2">Диаметр (мм)</label>
+                    <select
+                      value={selectedDiameter}
+                      onChange={(e) => setSelectedDiameter(e.target.value)}
+                      className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-[#DEE1E6] rounded-md focus:outline-none focus:ring-1 focus:ring-[#171A1F]"
+                    >
+                      <option value="">Все диаметры</option>
+                      {diameters.map(diameter => (
+                        <option key={diameter} value={diameter}>{diameter} мм</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Фильтр по толщине стенки */}
+                {thicknesses.length > 0 && (
+                  <div className="min-w-[150px]">
+                    <label className="block text-xs sm:text-sm font-medium text-[#171A1F] mb-1 sm:mb-2">Толщина (мм)</label>
+                    <select
+                      value={selectedThickness}
+                      onChange={(e) => setSelectedThickness(e.target.value)}
+                      className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-[#DEE1E6] rounded-md focus:outline-none focus:ring-1 focus:ring-[#171A1F]"
+                    >
+                      <option value="">Все толщины</option>
+                      {thicknesses.map(thickness => (
+                        <option key={thickness} value={thickness}>{thickness} мм</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Фильтр по ГОСТ/ТУ */}
+                {gosts.length > 0 && (
+                  <div className="min-w-[150px]">
+                    <label className="block text-xs sm:text-sm font-medium text-[#171A1F] mb-1 sm:mb-2">ГОСТ/ТУ</label>
+                    <select
+                      value={selectedGost}
+                      onChange={(e) => setSelectedGost(e.target.value)}
+                      className="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-[#DEE1E6] rounded-md focus:outline-none focus:ring-1 focus:ring-[#171A1F]"
+                    >
+                      <option value="">Все стандарты</option>
+                      {gosts.map(gost => (
+                        <option key={gost} value={gost}>{gost}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               {/* Выбор единиц измерения */}
@@ -183,7 +299,7 @@ export function Catalog({
                     onClick={() => setSelectedUnit('т')}
                     className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                       selectedUnit === 'т'
-                        ? 'bg-white text-[#171A1F] border border-[#F3F4F6]'
+                        ? 'bg-white text-[#171A1F] shadow-sm border border-[#F3F4F6]'
                         : 'text-[#565D6D] hover:text-[#171A1F]'
                     }`}
                   >
@@ -193,7 +309,7 @@ export function Catalog({
                     onClick={() => setSelectedUnit('м')}
                     className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                       selectedUnit === 'м'
-                        ? 'bg-white text-[#171A1F] border border-[#F3F4F6]'
+                        ? 'bg-white text-[#171A1F] shadow-sm border border-[#F3F4F6]'
                         : 'text-[#565D6D] hover:text-[#171A1F]'
                     }`}
                   >

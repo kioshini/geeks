@@ -49,6 +49,7 @@ export interface CatalogProps {
   onRemoveFromCart: (productId: string) => void;
   onUpdateQuantity: (productId: string, quantity: number) => void;
   cartItems: CartItem[];
+  resetFiltersTrigger?: number; // Триггер для сброса фильтров
 }
 
 /**

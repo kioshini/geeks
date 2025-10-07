@@ -1,5 +1,6 @@
 using TMKMiniApp.Models;
 using TMKMiniApp.Models.DTOs;
+using TMKMiniApp.Models.JsonModels;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
@@ -11,14 +12,18 @@ namespace TMKMiniApp.Services
         private readonly List<Product> _products;
         private readonly List<ProductType> _types;
         private readonly IDiscountService _discountService;
+        private readonly ILogger<ProductService> _logger;
+        private readonly JsonDataService _jsonDataService;
         private int _nextProductId = 1;
         private int _nextTypeId = 1;
 
-        public ProductService(IDiscountService discountService)
+        public ProductService(IDiscountService discountService, ILogger<ProductService> logger, JsonDataService jsonDataService)
         {
             _products = new List<Product>();
             _types = new List<ProductType>();
             _discountService = discountService;
+            _logger = logger;
+            _jsonDataService = jsonDataService;
             InitializeData();
         }
 
@@ -418,5 +423,186 @@ namespace TMKMiniApp.Services
             public double? PipeWallThickness { get; set; }
             public double? Koef { get; set; }
         }
+
+        #region Delta Update Methods
+
+        /// <summary>
+        /// Обновляет цену товара с учетом дельты
+        /// </summary>
+        public async Task<bool> UpdatePriceDeltaAsync(string productId, string stockId, PricesEl priceDelta)
+        {
+            try
+            {
+                var product = await GetProductByNomenclatureIdAsync(productId);
+                if (product == null)
+                {
+                    _logger.LogWarning("Товар с ID номенклатуры {ProductId} не найден", productId);
+                    return false;
+                }
+
+                // Применяем дельты к ценам
+                var newPriceT = Math.Max(0, (decimal)product.Price + (decimal)priceDelta.PriceT);
+                var newPriceM = Math.Max(0, (decimal)product.Price + (decimal)priceDelta.PriceM);
+
+                // Обновляем цену товара (используем среднее значение или основную цену)
+                product.Price = (newPriceT + newPriceM) / 2;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                _logger.LogInformation("Обновлена цена товара {ProductId}: {OldPrice} -> {NewPrice} (дельта T: {DeltaT}, M: {DeltaM})", 
+                    productId, product.Price, product.Price, priceDelta.PriceT, priceDelta.PriceM);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при обновлении дельты цены для товара {ProductId}", productId);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Обновляет остаток товара с учетом дельты
+        /// </summary>
+        public async Task<bool> UpdateStockDeltaAsync(string productId, string stockId, RemnantsEl remnantDelta)
+        {
+            try
+            {
+                var product = await GetProductByNomenclatureIdAsync(productId);
+                if (product == null)
+                {
+                    _logger.LogWarning("Товар с ID номенклатуры {ProductId} не найден", productId);
+                    return false;
+                }
+
+                // Применяем дельты к остаткам
+                var newStockT = Math.Max(0, product.StockQuantity + (int)remnantDelta.InStockT);
+                var newStockM = Math.Max(0, product.StockQuantity + (int)remnantDelta.InStockM);
+
+                // Обновляем остаток товара (используем среднее значение)
+                product.StockQuantity = (newStockT + newStockM) / 2;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                _logger.LogInformation("Обновлен остаток товара {ProductId}: {OldStock} -> {NewStock} (дельта T: {DeltaT}, M: {DeltaM})", 
+                    productId, product.StockQuantity, product.StockQuantity, remnantDelta.InStockT, remnantDelta.InStockM);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при обновлении дельты остатка для товара {ProductId}", productId);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Получает товар по ID номенклатуры
+        /// </summary>
+        public async Task<Product?> GetProductByNomenclatureIdAsync(string nomenclatureId)
+        {
+            try
+            {
+                // В реальной реализации здесь должен быть поиск по ID номенклатуры
+                // Пока что возвращаем первый товар для демонстрации
+                var products = await GetAllProductsAsync();
+                // Временная реализация - возвращаем null
+                // В реальной системе здесь должен быть поиск по ID номенклатуры
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при поиске товара по ID номенклатуры {NomenclatureId}", nomenclatureId);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Обновляет цену товара напрямую
+        /// </summary>
+        public async Task<bool> UpdateProductPriceAsync(string nomenclatureId, string stockId, decimal newPriceT, decimal newPriceM)
+        {
+            try
+            {
+                var product = await GetProductByNomenclatureIdAsync(nomenclatureId);
+                if (product == null)
+                {
+                    return false;
+                }
+
+                product.Price = (newPriceT + newPriceM) / 2;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                _logger.LogInformation("Обновлена цена товара {NomenclatureId}: {NewPrice}", nomenclatureId, product.Price);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при обновлении цены товара {NomenclatureId}", nomenclatureId);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Обновляет остаток товара напрямую
+        /// </summary>
+        public async Task<bool> UpdateProductStockAsync(string nomenclatureId, string stockId, decimal newStockT, decimal newStockM)
+        {
+            try
+            {
+                var product = await GetProductByNomenclatureIdAsync(nomenclatureId);
+                if (product == null)
+                {
+                    return false;
+                }
+
+                product.StockQuantity = (int)((newStockT + newStockM) / 2);
+                product.UpdatedAt = DateTime.UtcNow;
+
+                _logger.LogInformation("Обновлен остаток товара {NomenclatureId}: {NewStock}", nomenclatureId, product.StockQuantity);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при обновлении остатка товара {NomenclatureId}", nomenclatureId);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Получить данные о ценах для товара
+        /// </summary>
+        public async Task<PricesEl?> GetPriceDataAsync(string productId)
+        {
+            try
+            {
+                var pricesRoot = await _jsonDataService.LoadPricesAsync();
+                var prices = pricesRoot.ArrayOfPricesEl ?? new List<PricesEl>();
+                return prices.FirstOrDefault(p => p.ID == productId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при получении данных о ценах для товара {ProductId}", productId);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Получить данные об остатках для товара
+        /// </summary>
+        public async Task<RemnantsEl?> GetRemnantDataAsync(string productId)
+        {
+            try
+            {
+                var remnantsRoot = await _jsonDataService.LoadRemnantsAsync();
+                var remnants = remnantsRoot.ArrayOfRemnantsEl ?? new List<RemnantsEl>();
+                return remnants.FirstOrDefault(r => r.ID == productId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при получении данных об остатках для товара {ProductId}", productId);
+                return null;
+            }
+        }
+
+        #endregion
     }
 }

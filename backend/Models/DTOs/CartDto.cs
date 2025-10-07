@@ -13,21 +13,24 @@ namespace TMKMiniApp.Models.DTOs
     public class CartItemDto
     {
         public int Id { get; set; }
-        public int ProductId { get; set; }
+        public string ProductId { get; set; } = string.Empty;
         public ProductDto? Product { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public decimal TotalPrice { get; set; }
+        public string Unit { get; set; } = "шт";
     }
     
     public class AddToCartDto
     {
         [Required]
-        public int ProductId { get; set; }
+        public string ProductId { get; set; } = string.Empty;
         
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Количество должно быть больше 0")]
         public int Quantity { get; set; }
+        
+        public string? Unit { get; set; }
     }
     
     public class UpdateCartItemDto
@@ -35,5 +38,7 @@ namespace TMKMiniApp.Models.DTOs
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Количество должно быть больше 0")]
         public int Quantity { get; set; }
+        
+        public string? Unit { get; set; }
     }
 }
