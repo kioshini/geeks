@@ -241,13 +241,12 @@ namespace TMKMiniApp.Services
         {
             try
             {
-                // Пути к файлам в папке Data
-                var root = "/home/kioshi/apps/RealHackaton/backend";
-                var nomenclaturePath = Path.Combine(root, "Data", "nomenclature.json");
-                var typesPath = Path.Combine(root, "Data", "types.json");
-                var pricesPath = Path.Combine(root, "Data", "prices.json");
-                var remnantsPath = Path.Combine(root, "Data", "remnants.json");
-                var stocksPath = Path.Combine(root, "Data", "stocks.json");
+                // Пути к файлам в папке Data (относительные пути для Docker)
+                var nomenclaturePath = Path.Combine("Data", "nomenclature.json");
+                var typesPath = Path.Combine("Data", "types.json");
+                var pricesPath = Path.Combine("Data", "prices.json");
+                var remnantsPath = Path.Combine("Data", "remnants.json");
+                var stocksPath = Path.Combine("Data", "stocks.json");
 
                 if (!File.Exists(nomenclaturePath))
                 {
@@ -271,21 +270,17 @@ namespace TMKMiniApp.Services
                 var idToPrice = new Dictionary<string, decimal>();
                 if (File.Exists(pricesPath))
                 {
-                    // Ожидаемый формат неизвестен; если есть поля ID/Price, заполним
+                    // Загружаем цены из JSON файла
                     try
                     {
-                        var pricesJson = JsonDocument.Parse(File.ReadAllText(pricesPath));
-                        foreach (var el in pricesJson.RootElement.EnumerateArray())
+                        var pricesDoc = JsonSerializer.Deserialize<PricesRoot>(File.ReadAllText(pricesPath), jsonOptions);
+                        if (pricesDoc?.ArrayOfPricesEl != null)
                         {
-                            if (el.TryGetProperty("ID", out var idProp))
+                            foreach (var price in pricesDoc.ArrayOfPricesEl)
                             {
-                                var id = idProp.GetString() ?? string.Empty;
-                                if (el.TryGetProperty("Price", out var priceProp))
+                                if (!string.IsNullOrEmpty(price.ID) && price.PriceT > 0)
                                 {
-                                    if (decimal.TryParse(priceProp.ToString(), out var price))
-                                    {
-                                        idToPrice[id] = price;
-                                    }
+                                    idToPrice[price.ID] = price.PriceT;
                                 }
                             }
                         }
@@ -294,35 +289,24 @@ namespace TMKMiniApp.Services
                 }
 
                 var idToStock = new Dictionary<string, int>();
-                // Пытаемся взять остатки из remnants или stocks по полю ID/Quantity
-                foreach (var path in new[] { remnantsPath, stocksPath })
+                // Загружаем остатки из remnants.json
+                if (File.Exists(remnantsPath))
                 {
-                    if (File.Exists(path))
+                    try
                     {
-                        try
+                        var remnantsDoc = JsonSerializer.Deserialize<RemnantsRoot>(File.ReadAllText(remnantsPath), jsonOptions);
+                        if (remnantsDoc?.ArrayOfRemnantsEl != null)
                         {
-                            var doc = JsonDocument.Parse(File.ReadAllText(path));
-                            foreach (var el in doc.RootElement.EnumerateArray())
+                            foreach (var remnant in remnantsDoc.ArrayOfRemnantsEl)
                             {
-                                var id = el.TryGetProperty("ID", out var idProp) ? (idProp.GetString() ?? string.Empty) : string.Empty;
-                                if (string.IsNullOrEmpty(id)) continue;
-                                int qty = 0;
-                                if (el.TryGetProperty("Quantity", out var qProp))
+                                if (!string.IsNullOrEmpty(remnant.ID) && remnant.InStockT > 0)
                                 {
-                                    int.TryParse(qProp.ToString(), out qty);
-                                }
-                                else if (el.TryGetProperty("Remnant", out var rProp))
-                                {
-                                    int.TryParse(rProp.ToString(), out qty);
-                                }
-                                if (qty > 0)
-                                {
-                                    idToStock[id] = qty;
+                                    idToStock[remnant.ID] = (int)remnant.InStockT;
                                 }
                             }
                         }
-                        catch { /* best-effort */ }
                     }
+                    catch { /* best-effort */ }
                 }
 
                 _products.Clear();
@@ -344,9 +328,9 @@ namespace TMKMiniApp.Services
                     decimal? diameter = n.Diameter.HasValue ? (decimal?)Convert.ToDecimal(n.Diameter.Value) : null;
                     decimal? thickness = n.PipeWallThickness.HasValue ? (decimal?)Convert.ToDecimal(n.PipeWallThickness.Value) : null;
 
-                    // Цена: из файла цен, иначе грубая оценка по коэффициенту (если есть)
+                    // Цена: из файла цен по ID товара
                     decimal price = 0m;
-                    if (idToPrice.TryGetValue(code, out var p))
+                    if (idToPrice.TryGetValue(n.ID, out var p))
                     {
                         price = p;
                     }
@@ -357,7 +341,7 @@ namespace TMKMiniApp.Services
                     }
 
                     var stock = 0;
-                    if (idToStock.TryGetValue(code, out var s))
+                    if (idToStock.TryGetValue(n.ID, out var s))
                     {
                         stock = s;
                     }
