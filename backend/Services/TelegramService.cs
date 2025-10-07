@@ -32,7 +32,7 @@ namespace TMKMiniApp.Services
                 _logger.LogWarning("Для получения chat_id выполните следующие шаги:");
                 _logger.LogWarning("1. Найдите бота @your_bot_name в Telegram");
                 _logger.LogWarning("2. Отправьте боту любое сообщение");
-                _logger.LogWarning("3. Выполните запрос: GET https://api.telegram.org/bot{_botToken}/getUpdates");
+                _logger.LogWarning("3. Выполните запрос: GET https://api.telegram.org/bot{botToken}/getUpdates", _botToken);
                 _logger.LogWarning("4. Найдите 'chat':{'id': НУЖНЫЙ_ID} в ответе");
                 _logger.LogWarning("5. Добавьте этот ID в appsettings.json как 'Telegram:ChatId'");
             }
@@ -89,22 +89,22 @@ namespace TMKMiniApp.Services
             sb.AppendLine("👤 **ДАННЫЕ КЛИЕНТА:**");
             sb.AppendLine($"Имя: {order.FirstName}");
             sb.AppendLine($"Фамилия: {order.LastName}");
-            sb.AppendLine($"ИНН: {order.Inn}");
+            sb.AppendLine($"ИНН: {order.INN}");
             sb.AppendLine($"Телефон: {order.Phone}");
             sb.AppendLine($"Email: {order.Email}");
             sb.AppendLine();
             
             sb.AppendLine("📦 **ТОВАРЫ:**");
-            foreach (var item in order.OrderItems)
+            foreach (var item in order.Items)
             {
                 sb.AppendLine($"• {item.Product?.Name ?? "Неизвестный товар"}");
                 sb.AppendLine($"  Количество: {item.Quantity} {GetUnitDisplay(item.Unit)}");
-                sb.AppendLine($"  Цена за единицу: {item.Price:F2} ₽");
+                sb.AppendLine($"  Цена за единицу: {item.UnitPrice:F2} ₽");
                 sb.AppendLine($"  Сумма: {item.TotalPrice:F2} ₽");
                 sb.AppendLine();
             }
             
-            sb.AppendLine($"💰 **ИТОГО: {order.TotalAmount:F2} ₽**");
+            sb.AppendLine($"💰 **ИТОГО: {order.TotalPrice:F2} ₽**");
             
             return sb.ToString();
         }
