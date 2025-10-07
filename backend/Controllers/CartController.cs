@@ -154,59 +154,7 @@ namespace TMKMiniApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Обновить количество товара в корзине по productId
-        /// </summary>
-        [HttpPut("{userId}/items/product/{productId}")]
-        public async Task<ActionResult<CartItemDto>> UpdateCartItemByProductId(long userId, int productId, UpdateCartItemDto updateCartItemDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
 
-                var itemId = await _cartService.GetCartItemIdByProductIdAsync(userId, productId);
-                if (itemId == null)
-                    return NotFound($"Товар с ID {productId} не найден в корзине пользователя {userId}");
-
-                var cartItem = await _cartService.UpdateCartItemAsync(userId, itemId.Value, updateCartItemDto);
-                return Ok(cartItem);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Ошибка при обновлении товара в корзине пользователя {UserId}", userId);
-                return StatusCode(500, "Внутренняя ошибка сервера");
-            }
-        }
-
-        /// <summary>
-        /// Удалить товар из корзины по productId
-        /// </summary>
-        [HttpDelete("{userId}/items/product/{productId}")]
-        public async Task<ActionResult> RemoveFromCartByProductId(long userId, int productId)
-        {
-            try
-            {
-                var itemId = await _cartService.GetCartItemIdByProductIdAsync(userId, productId);
-                if (itemId == null)
-                    return NotFound($"Товар с ID {productId} не найден в корзине пользователя {userId}");
-
-                var result = await _cartService.RemoveFromCartAsync(userId, itemId.Value);
-                if (!result)
-                    return NotFound($"Товар с ID {productId} не найден в корзине пользователя {userId}");
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Ошибка при удалении товара из корзины пользователя {UserId}", userId);
-                return StatusCode(500, "Внутренняя ошибка сервера");
-            }
-        }
 
         /// <summary>
         /// Рассчитать скидку для товара
