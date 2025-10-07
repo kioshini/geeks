@@ -105,7 +105,7 @@ export function ProductModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50"
           onClick={handleBackdropClick}
         >
           <motion.div
@@ -113,7 +113,7 @@ export function ProductModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-2 sm:mx-4"
+            className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-2 sm:mx-4 relative"
           >
             {/* Заголовок модалки */}
             <div className="flex items-center justify-between p-3 sm:p-6 border-b border-gray-300">

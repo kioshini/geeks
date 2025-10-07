@@ -425,18 +425,18 @@ export function Catalog({
           )}
         </motion.div>
       )}
-
-        {/* Модальное окно товара */}
-        <ProductModal
-          product={selectedProduct}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          cartQuantity={selectedProduct ? getCartQuantity(selectedProduct.id) : 0}
-          onAddToCart={onAddToCart}
-          onRemoveFromCart={onRemoveFromCart}
-          onUpdateQuantity={onUpdateQuantity}
-        />
       </div>
+
+      {/* Модальное окно товара - вынесено за пределы основного контейнера */}
+      <ProductModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        cartQuantity={selectedProduct ? getCartQuantity(selectedProduct.id) : 0}
+        onAddToCart={onAddToCart}
+        onRemoveFromCart={onRemoveFromCart}
+        onUpdateQuantity={onUpdateQuantity}
+      />
     </div>
   );
 }
