@@ -87,17 +87,32 @@ namespace TMKMiniApp.Controllers
         {
             try
             {
+                // Логируем входящие данные для отладки
+                _logger.LogInformation("Получен запрос на создание заказа: INN='{INN}', FirstName='{FirstName}', LastName='{LastName}'", 
+                    orderRequest.INN, orderRequest.FirstName, orderRequest.LastName);
+
                 // Валидация с помощью FluentValidation
                 var validationResult = await _orderRequestValidator.ValidateAsync(orderRequest);
                 if (!validationResult.IsValid)
                 {
                     var errors = validationResult.Errors.Select(e => new { Field = e.PropertyName, Message = e.ErrorMessage });
+                    _logger.LogWarning("Ошибки валидации FluentValidation: {Errors}", string.Join(", ", errors.Select(e => $"{e.Field}: {e.Message}")));
                     return BadRequest(new { Message = "Ошибки валидации", Errors = errors });
                 }
 
                 // Дополнительная валидация ModelState
                 if (!ModelState.IsValid)
+                {
+                    var modelStateErrors = ModelState
+                        .Where(x => x.Value.Errors.Count > 0)
+                        .ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                        );
+                    _logger.LogWarning("Ошибки валидации ModelState: {Errors}", 
+                        string.Join(", ", modelStateErrors.Select(kvp => $"{kvp.Key}: {string.Join(", ", kvp.Value)}")));
                     return BadRequest(ModelState);
+                }
 
                 var order = await _orderService.CreateOrderFromRequestAsync(orderRequest);
                 return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
