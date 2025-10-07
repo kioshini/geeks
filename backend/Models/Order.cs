@@ -25,7 +25,6 @@ namespace TMKMiniApp.Models
         public string LastName { get; set; } = string.Empty;
         
         [Required]
-        [RegularExpression(@"^\d{10}$|^\d{12}$", ErrorMessage = "ИНН должен содержать 10 или 12 цифр")]
         [JsonPropertyName("INN")]
         public string INN { get; set; } = string.Empty;
         
