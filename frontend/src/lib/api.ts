@@ -251,17 +251,7 @@ export const Api = {
 	 * @param body - Cart item data
 	 * @returns Promise resolving to added cart item
 	 */
-	addToCart: async (userId: number, body: AddToCartDto) => {
-		console.log('API: addToCart запрос', { userId, body, url: `/api/cart/${userId}/items` });
-		try {
-			const response = await api.post<CartItemDto>(`/api/cart/${userId}/items`, body);
-			console.log('API: addToCart успех', response.data);
-			return response.data;
-		} catch (error) {
-			console.error('API: addToCart ошибка', error);
-			throw error;
-		}
-	},
+	addToCart: async (userId: number, body: AddToCartDto) => (await api.post<CartItemDto>(`/api/cart/${userId}/items`, body)).data,
 	
 	/**
 	 * Update cart item quantity

@@ -30,24 +30,11 @@ export function ProductCard({
   };
 
   const handleAddToCart = () => {
-    console.log('ProductCard: Кнопка нажата!', { 
-      product: product.name, 
-      quantity, 
-      productId: product.id,
-      onAddToCart: typeof onAddToCart,
-      isInStock 
-    });
     try {
-      if (typeof onAddToCart === 'function') {
-        console.log('ProductCard: Вызываем onAddToCart...');
-        onAddToCart(product, quantity);
-        setQuantity(1);
-        console.log('ProductCard: Товар успешно добавлен в корзину');
-      } else {
-        console.error('ProductCard: onAddToCart не является функцией!', onAddToCart);
-      }
+      onAddToCart(product, quantity);
+      setQuantity(1);
     } catch (error) {
-      console.error('ProductCard: Ошибка при добавлении в корзину:', error);
+      console.error('Ошибка при добавлении в корзину:', error);
     }
   };
 

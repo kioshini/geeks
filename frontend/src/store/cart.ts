@@ -41,20 +41,12 @@ export const useCartStore = create<CartState>((set, get) => ({
 
 	add: async (dto: AddToCartDto) => {
 		const userId = get().userId;
-		console.log('CartStore: add вызван', { dto, userId });
-		if (!userId) {
-			console.error('CartStore: userId не установлен!');
-			return;
-		}
+		if (!userId) return;
 		set({ loading: true, error: undefined });
 		try {
-			console.log('CartStore: Отправляем запрос в API...', { userId, dto });
 			await Api.addToCart(userId, dto);
-			console.log('CartStore: API запрос успешен, загружаем корзину...');
 			await get().loadCart();
-			console.log('CartStore: Корзина загружена успешно');
 		} catch (e: any) {
-			console.error('CartStore: Ошибка при добавлении в корзину:', e);
 			set({ error: e?.response?.data || e?.message || 'Failed to add to cart' });
 		} finally {
 			set({ loading: false });

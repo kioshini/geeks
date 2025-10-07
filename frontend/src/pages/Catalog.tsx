@@ -129,34 +129,18 @@ export function CatalogPage() {
 
   // Обработчики для работы с корзиной
   const handleAddToCart = (product: Product, quantity: number) => {
-    console.log('CatalogPage: Получен запрос на добавление в корзину', { 
-      productId: product.id, 
-      quantity, 
-      productName: product.name, 
-      unit: selectedUnit,
-      userId: cart?.userId || 'не установлен',
-      addFunction: typeof add
-    });
     try {
-      if (typeof add === 'function') {
-        console.log('CatalogPage: Вызываем add из store...');
-        add({ productId: product.id.toString(), quantity, unit: selectedUnit });
-        console.log('CatalogPage: Товар успешно добавлен в корзину');
-      } else {
-        console.error('CatalogPage: add не является функцией!', add);
-      }
+      add({ productId: product.id.toString(), quantity, unit: selectedUnit });
     } catch (error) {
-      console.error('CatalogPage: Ошибка при добавлении в корзину:', error);
+      console.error('Ошибка при добавлении в корзину:', error);
     }
   };
 
   const handleRemoveFromCart = (productId: number) => {
-    console.log('CatalogPage: Удаление из корзины', { productId });
     removeByProductId(productId.toString());
   };
 
   const handleUpdateQuantity = (productId: number, quantity: number) => {
-    console.log('CatalogPage: Обновление количества', { productId, quantity, unit: selectedUnit });
     if (quantity <= 0) {
       handleRemoveFromCart(productId);
     } else {
