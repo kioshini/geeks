@@ -226,7 +226,7 @@ export function ProductCard({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">В корзине:</span>
-                <span className="font-semibold text-orange-500">{cartQuantity} {cartUnit === 'т' ? 'т' : cartUnit === 'м' ? 'м' : 'шт'}</span>
+                <span className="font-semibold text-orange-500">{cartQuantity} {cartUnit === 'т' ? 'т' : 'м'}</span>
               </div>
               
               <div className="flex items-center space-x-1 sm:space-x-2">

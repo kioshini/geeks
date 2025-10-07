@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
-export type Unit = 'шт' | 'м' | 'т';
+export type Unit = 'м' | 'т';
 
 interface UnitContextType {
   selectedUnit: Unit;
@@ -14,7 +14,7 @@ interface UnitProviderProps {
 }
 
 export function UnitProvider({ children }: UnitProviderProps) {
-  const [selectedUnit, setSelectedUnit] = useState<Unit>('шт');
+  const [selectedUnit, setSelectedUnit] = useState<Unit>('т');
 
   const handleSetSelectedUnit = (unit: Unit) => {
     console.log('UnitContext: Setting unit to', unit);

@@ -1,7 +1,7 @@
 // import { useState } from 'react';
 
 /** Available units of measurement */
-export type Unit = 'шт' | 'м' | 'т';
+export type Unit = 'м' | 'т';
 
 /**
  * Props for UnitToggle component
@@ -32,7 +32,6 @@ interface UnitToggleProps {
  */
 export function UnitToggle({ selectedUnit, onUnitChange, className = '' }: UnitToggleProps) {
   const units: { value: Unit; label: string; description: string }[] = [
-    { value: 'шт', label: 'Штуки', description: 'Поштучно' },
     { value: 'м', label: 'Метры', description: 'Погонные метры' },
     { value: 'т', label: 'Тонны', description: 'Вес в тоннах' }
   ];

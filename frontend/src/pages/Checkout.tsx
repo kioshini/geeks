@@ -92,7 +92,7 @@ export function CheckoutPage() {
 				orderedItems: cart.items.map(i => ({
 					productId: i.productId.toString(),
 					quantity: i.quantity,
-					unit: 'шт', // По умолчанию штуки
+					unit: i.unit, // Используем единицу измерения из корзины
 					unitPrice: i.product?.price || 0
 				}))
 			};
@@ -158,7 +158,7 @@ export function CheckoutPage() {
 									Материал: {item.product?.material || 'Не указан'}
 								</div>
 								<div className="text-sm text-gray-500 mt-1">
-									{item.quantity} шт × {item.price.toFixed(2)} ₽
+									{item.quantity} {item.unit === 'т' ? 'т' : 'м'} × {item.price.toFixed(2)} ₽
 								</div>
 							</div>
 							<div className="text-xl font-bold text-gray-900">

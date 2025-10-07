@@ -121,7 +121,7 @@ export function Catalog({
   // Получаем единицу измерения товара в корзине
   const getCartUnit = (productId: number): string => {
     const cartItem = cartItems.find(item => item.product.id === productId);
-    return cartItem ? cartItem.unit : 'шт';
+    return cartItem ? cartItem.unit : 'т';
   };
 
   // Обработчики событий
@@ -440,7 +440,7 @@ export function Catalog({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         cartQuantity={selectedProduct ? getCartQuantity(selectedProduct.id) : 0}
-        cartUnit={selectedProduct ? getCartUnit(selectedProduct.id) : 'шт'}
+        cartUnit={selectedProduct ? getCartUnit(selectedProduct.id) : 'т'}
         onAddToCart={onAddToCart}
         onRemoveFromCart={onRemoveFromCart}
         onUpdateQuantity={onUpdateQuantity}

@@ -358,7 +358,7 @@ export function ProductModal({
                       <div className="space-y-4">
                         <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
                           <span className="text-green-800 font-medium">Товар уже в корзине</span>
-                          <span className="text-green-600 font-bold text-lg">{cartQuantity} {cartUnit === 'т' ? 'т' : cartUnit === 'м' ? 'м' : 'шт'}</span>
+                          <span className="text-green-600 font-bold text-lg">{cartQuantity} {cartUnit === 'т' ? 'т' : 'м'}</span>
                         </div>
                         
                         <div className="flex items-center space-x-4">
