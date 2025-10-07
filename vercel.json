@@ -1,18 +1,16 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "frontend/vite.config.js",
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/(.*)",
+      "dest": "frontend/dist/index.html"
+    }
   ],
-  "env": {
-    "VITE_API_BASE_URL": "https://your-api-domain.com"
-  }
+  "framework": "vite",
+  "outputDirectory": "frontend/dist"
 }
