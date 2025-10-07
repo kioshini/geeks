@@ -62,7 +62,7 @@ namespace TMKMiniApp.Controllers
         /// Получить заказ по ID
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDto>> GetOrder(int id)
+        public async Task<ActionResult<OrderDto>> GetOrder(Guid id)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace TMKMiniApp.Controllers
         /// Обновить статус заказа
         /// </summary>
         [HttpPut("{id}/status")]
-        public async Task<ActionResult<OrderDto>> UpdateOrderStatus(int id, UpdateOrderStatusDto updateOrderStatusDto)
+        public async Task<ActionResult<OrderDto>> UpdateOrderStatus(Guid id, UpdateOrderStatusDto updateOrderStatusDto)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace TMKMiniApp.Controllers
         /// Удалить заказ
         /// </summary>
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteOrder(int id)
+        public async Task<ActionResult> DeleteOrder(Guid id)
         {
             try
             {

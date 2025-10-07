@@ -23,8 +23,8 @@ namespace TMKMiniApp.Services
             _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
-            _botToken = _configuration["Telegram:BotToken"] ?? "8089111666:AAE9yHQFUR4VJP_CuDHN9rPO0mc26fVDMNs";
-            _chatId = _configuration["Telegram:ChatId"];
+            _botToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN") ?? _configuration["Telegram:BotToken"];
+            _chatId = Environment.GetEnvironmentVariable("TELEGRAM_CHAT_ID") ?? _configuration["Telegram:ChatId"];
             
             if (string.IsNullOrEmpty(_chatId))
             {
@@ -32,7 +32,7 @@ namespace TMKMiniApp.Services
                 _logger.LogWarning("Для получения chat_id выполните следующие шаги:");
                 _logger.LogWarning("1. Найдите бота @your_bot_name в Telegram");
                 _logger.LogWarning("2. Отправьте боту любое сообщение");
-                _logger.LogWarning("3. Выполните запрос: GET https://api.telegram.org/bot{botToken}/getUpdates", _botToken);
+                _logger.LogWarning("3. Выполните запрос: GET https://api.telegram.org/bot{0}/getUpdates", _botToken);
                 _logger.LogWarning("4. Найдите 'chat':{'id': НУЖНЫЙ_ID} в ответе");
                 _logger.LogWarning("5. Добавьте этот ID в appsettings.json как 'Telegram:ChatId'");
             }

@@ -31,7 +31,7 @@ namespace TMKMiniApp.Services
             return orderDtos;
         }
 
-        public async Task<OrderDto?> GetOrderByIdAsync(int orderId)
+        public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
         {
             var order = _orders.FirstOrDefault(o => o.Id == orderId);
             return order != null ? await MapToDtoAsync(order) : null;
@@ -57,10 +57,10 @@ namespace TMKMiniApp.Services
 
                 var orderItem = new OrderItem
                 {
-                    Id = orderItemId++,
-                    ProductId = itemDto.ProductId,
+                    ID = itemDto.ProductId,
+                    Name = product.Name,
                     Quantity = itemDto.Quantity,
-                    UnitPrice = product.Price,
+                    Price = product.Price,
                     Unit = "шт", // По умолчанию
                     CreatedAt = DateTime.UtcNow
                 };
@@ -73,7 +73,7 @@ namespace TMKMiniApp.Services
 
             var order = new Order
             {
-                Id = _nextOrderId++,
+                Id = Guid.NewGuid(),
                 UserId = createOrderDto.UserId,
                 FirstName = createOrderDto.FirstName,
                 LastName = createOrderDto.LastName,
@@ -170,7 +170,7 @@ namespace TMKMiniApp.Services
             return await MapToDtoAsync(order);
         }
 
-        public async Task<OrderDto?> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusDto updateOrderStatusDto)
+        public async Task<OrderDto?> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusDto updateOrderStatusDto)
         {
             var order = _orders.FirstOrDefault(o => o.Id == orderId);
             if (order == null) return null;
@@ -194,7 +194,7 @@ namespace TMKMiniApp.Services
             return await MapToDtoAsync(order);
         }
 
-        public async Task<bool> DeleteOrderAsync(int orderId)
+        public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
             var order = _orders.FirstOrDefault(o => o.Id == orderId);
             if (order == null) return false;
@@ -237,21 +237,21 @@ namespace TMKMiniApp.Services
 
             foreach (var item in order.Items)
             {
-                var product = await _productService.GetProductByIdAsync(int.Parse(item.ProductId));
+                var product = await _productService.GetProductByIdAsync(int.Parse(item.ID));
                 orderItemDtos.Add(new OrderItemDto
                 {
-                    Id = item.Id,
-                    ProductId = item.ProductId,
+                    Id = item.Id.ToString(),
+                    ProductId = item.ID,
                     Product = product,
-                    Quantity = item.Quantity,
-                    Price = item.UnitPrice,
-                    TotalPrice = item.TotalPrice
+                    Quantity = (int)item.Quantity,
+                    Price = item.Price,
+                    TotalPrice = item.Price * (decimal)item.Quantity
                 });
             }
 
             return new OrderDto
             {
-                Id = order.Id,
+                Id = order.Id.ToString(),
                 UserId = order.UserId,
                 FirstName = order.FirstName,
                 LastName = order.LastName,

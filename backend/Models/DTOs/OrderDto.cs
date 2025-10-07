@@ -4,7 +4,7 @@ namespace TMKMiniApp.Models.DTOs
 {
     public class OrderDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public long UserId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
@@ -21,7 +21,7 @@ namespace TMKMiniApp.Models.DTOs
     
     public class OrderItemDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public string ProductId { get; set; } = string.Empty;
         public ProductDto? Product { get; set; }
         public int Quantity { get; set; }
