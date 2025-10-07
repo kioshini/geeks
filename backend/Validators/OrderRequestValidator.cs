@@ -22,8 +22,7 @@ namespace TMKMiniApp.Validators
 
             RuleFor(x => x.INN)
                 .NotEmpty().WithMessage("ИНН обязателен для заполнения")
-                .Matches(@"^\d{10}$|^\d{12}$").WithMessage("ИНН должен содержать 10 или 12 цифр")
-                .Must(BeValidINN).WithMessage("Неверный формат ИНН");
+                .Matches(@"^\d{10}$|^\d{12}$").WithMessage("ИНН должен содержать 10 или 12 цифр");
 
             RuleFor(x => x.Phone)
                 .NotEmpty().WithMessage("Телефон обязателен для заполнения")
@@ -42,14 +41,6 @@ namespace TMKMiniApp.Validators
                 .SetValidator(new OrderedItemValidator());
         }
 
-        private bool BeValidINN(string inn)
-        {
-            if (string.IsNullOrEmpty(inn) || (inn.Length != 10 && inn.Length != 12))
-                return false;
-
-            // Простая проверка на цифры (убрана проверка контрольной суммы для тестирования)
-            return inn.All(char.IsDigit);
-        }
 
     }
 

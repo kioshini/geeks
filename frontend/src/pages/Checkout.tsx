@@ -86,7 +86,7 @@ export function CheckoutPage() {
 			const orderRequest: OrderRequest = {
 				firstName: firstName.trim(),
 				lastName: lastName.trim(),
-				INN: inn.trim(),
+				INN: inn.trim().replace(/\D/g, ''), // Убираем все нецифровые символы
 				phone: phone.trim(),
 				email: email.trim(),
 				OrderedItems: cart.items.map(i => ({
