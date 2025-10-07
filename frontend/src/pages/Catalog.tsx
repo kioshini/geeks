@@ -128,10 +128,22 @@ export function CatalogPage() {
 
   // Обработчики для работы с корзиной
   const handleAddToCart = (product: Product, quantity: number) => {
-    console.log('CatalogPage: Добавление в корзину', { productId: product.id, quantity, productName: product.name, unit: selectedUnit });
+    console.log('CatalogPage: Получен запрос на добавление в корзину', { 
+      productId: product.id, 
+      quantity, 
+      productName: product.name, 
+      unit: selectedUnit,
+      userId: cart?.userId || 'не установлен',
+      addFunction: typeof add
+    });
     try {
-      add({ productId: product.id.toString(), quantity, unit: selectedUnit });
-      console.log('CatalogPage: Товар успешно добавлен в корзину');
+      if (typeof add === 'function') {
+        console.log('CatalogPage: Вызываем add из store...');
+        add({ productId: product.id.toString(), quantity, unit: selectedUnit });
+        console.log('CatalogPage: Товар успешно добавлен в корзину');
+      } else {
+        console.error('CatalogPage: add не является функцией!', add);
+      }
     } catch (error) {
       console.error('CatalogPage: Ошибка при добавлении в корзину:', error);
     }
