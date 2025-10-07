@@ -51,7 +51,7 @@ namespace TMKMiniApp.Validators
     {
         public OrderedItemValidator()
         {
-            RuleFor(x => x.ProductId)
+            RuleFor(x => x.ID)
                 .NotEmpty().WithMessage("ID товара обязателен");
 
             RuleFor(x => x.Quantity)
@@ -60,9 +60,9 @@ namespace TMKMiniApp.Validators
 
             RuleFor(x => x.Unit)
                 .NotEmpty().WithMessage("Единица измерения обязательна")
-                .Must(unit => unit == "т" || unit == "м").WithMessage("Единица измерения должна быть 'т' или 'м'");
+                .Must(unit => unit == "т" || unit == "м" || unit == "t" || unit == "m").WithMessage("Единица измерения должна быть 'т', 'м', 't' или 'm'");
 
-            RuleFor(x => x.UnitPrice)
+            RuleFor(x => x.Price)
                 .GreaterThan(0).WithMessage("Цена за единицу должна быть больше 0")
                 .LessThan(1000000).WithMessage("Цена за единицу не может превышать 1000000");
         }
