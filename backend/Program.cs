@@ -78,6 +78,7 @@ builder.Services.AddSingleton<ICartService, CartService>();
 builder.Services.AddSingleton<IOrderService, OrderService>();
 builder.Services.AddSingleton<IDataSyncService, DataSyncService>();
 builder.Services.AddSingleton<JsonDataService>();
+builder.Services.AddHttpClient<ITelegramService, TelegramService>();
 builder.Services.AddScoped<TMKMiniApp.Validators.OrderRequestValidator>();
 
 // Register Delta Updates Service

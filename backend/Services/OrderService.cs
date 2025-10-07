@@ -8,12 +8,14 @@ namespace TMKMiniApp.Services
     {
         private readonly List<Order> _orders;
         private readonly IProductService _productService;
+        private readonly ITelegramService _telegramService;
         private int _nextOrderId = 1;
 
-        public OrderService(IProductService productService)
+        public OrderService(IProductService productService, ITelegramService telegramService)
         {
             _orders = new List<Order>();
             _productService = productService;
+            _telegramService = telegramService;
         }
 
         public async Task<IEnumerable<OrderDto>> GetOrdersByUserIdAsync(long userId)
@@ -86,6 +88,18 @@ namespace TMKMiniApp.Services
             };
 
             _orders.Add(order);
+            
+            // Отправляем заказ в Telegram
+            try
+            {
+                await _telegramService.SendOrderAsync(order);
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку, но не прерываем создание заказа
+                Console.WriteLine($"Ошибка при отправке заказа в Telegram: {ex.Message}");
+            }
+            
             return await MapToDtoAsync(order);
         }
 
@@ -138,6 +152,18 @@ namespace TMKMiniApp.Services
             };
 
             _orders.Add(order);
+            
+            // Отправляем заказ в Telegram
+            try
+            {
+                await _telegramService.SendOrderAsync(order);
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку, но не прерываем создание заказа
+                Console.WriteLine($"Ошибка при отправке заказа в Telegram: {ex.Message}");
+            }
+            
             return await MapToDtoAsync(order);
         }
 
