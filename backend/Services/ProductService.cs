@@ -329,6 +329,8 @@ namespace TMKMiniApp.Services
                 _types.Clear();
                 _nextProductId = 1;
                 _nextTypeId = 1;
+                
+                int maxId = 0;
 
                 var typeNameSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -380,9 +382,12 @@ namespace TMKMiniApp.Services
                         });
                     }
 
+                    var productId = int.Parse(n.ID);
+                    maxId = Math.Max(maxId, productId);
+                    
                     _products.Add(new Product
                     {
-                        Id = _nextProductId++,
+                        Id = productId,
                         Name = name,
                         Code = code,
                         Description = n.Gost,
@@ -397,6 +402,9 @@ namespace TMKMiniApp.Services
                         UpdatedAt = DateTime.UtcNow
                     });
                 }
+
+                // Устанавливаем _nextProductId больше максимального ID из JSON
+                _nextProductId = maxId + 1;
 
                 return _products.Count > 0;
             }

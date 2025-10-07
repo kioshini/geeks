@@ -29,24 +29,12 @@ export function CatalogPage() {
     }
   }, [location.pathname]);
 
-  // Функция для загрузки данных
+  // Функция для загрузки данных из JSON
   const loadJsonData = useCallback(async () => {
     try {
-      console.log('Загрузка данных из API...');
-      
-      // Сначала пробуем загрузить из API
-      try {
-        const apiProducts = await Api.getProducts();
-        const adaptedProducts = adaptProductDtosToProducts(apiProducts);
-        setProducts(adaptedProducts);
-        console.log(`Загружено ${adaptedProducts.length} товаров через API`);
-        return;
-      } catch (apiError) {
-        console.log('API недоступен, переключаемся на JSON данные...', apiError);
-      }
-      
-      // Если API не работает, загружаем из JSON
       console.log('Загрузка данных из JSON...');
+      
+      // Загружаем все JSON данные параллельно
       const [nomenclature, prices, remnants, stocks, types] = await Promise.all([
         Api.getNomenclature(),
         Api.getPrices(),
@@ -69,8 +57,19 @@ export function CatalogPage() {
       
       console.log(`Преобразовано ${adaptedProducts.length} товаров из JSON данных`);
     } catch (error) {
-      console.error('Ошибка при загрузке данных:', error);
-      setProducts([]);
+      console.error('Ошибка при загрузке JSON данных:', error);
+      
+      // Fallback на старый API
+      try {
+        console.log('Переключение на старый API...');
+        const [p] = await Promise.all([Api.getProducts()]);
+        const adaptedProducts = adaptProductDtosToProducts(p);
+        setProducts(adaptedProducts);
+        console.log(`Загружено ${adaptedProducts.length} товаров через старый API`);
+      } catch (fallbackError) {
+        console.error('Ошибка при загрузке через старый API:', fallbackError);
+        setProducts([]);
+      }
     }
   }, []);
 
