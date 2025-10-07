@@ -81,30 +81,37 @@ namespace TMKMiniApp.Services
         {
             var sb = new StringBuilder();
             
-            sb.AppendLine("🛒 **НОВЫЙ ЗАКАЗ**");
-            sb.AppendLine($"📋 Номер заказа: #{order.Id}");
-            sb.AppendLine($"📅 Дата: {order.CreatedAt:dd.MM.yyyy HH:mm}");
-            sb.AppendLine();
-            
-            sb.AppendLine("👤 **ДАННЫЕ КЛИЕНТА:**");
-            sb.AppendLine($"Имя: {order.FirstName}");
-            sb.AppendLine($"Фамилия: {order.LastName}");
+            sb.AppendLine("📦 **НОВЫЙ ЗАКАЗ**");
+            sb.AppendLine($"ID: {order.Id}");
+            sb.AppendLine($"Дата: {order.CreatedAt:yyyy-MM-dd HH:mm} (UTC)");
+            sb.AppendLine($"Имя: {order.FirstName} {order.LastName}");
             sb.AppendLine($"ИНН: {order.INN}");
             sb.AppendLine($"Телефон: {order.Phone}");
             sb.AppendLine($"Email: {order.Email}");
-            sb.AppendLine();
             
-            sb.AppendLine("📦 **ТОВАРЫ:**");
+            if (!string.IsNullOrWhiteSpace(order.DeliveryAddress))
+                sb.AppendLine($"Адрес доставки: {order.DeliveryAddress}");
+            
+            if (order.PreferredDeliveryDate.HasValue)
+                sb.AppendLine($"Желаемая дата: {order.PreferredDeliveryDate:yyyy-MM-dd}");
+            
+            if (!string.IsNullOrWhiteSpace(order.PaymentMethod))
+                sb.AppendLine($"Оплата: {order.PaymentMethod}");
+            
+            if (!string.IsNullOrWhiteSpace(order.Comment))
+                sb.AppendLine($"\nПримечание: {order.Comment}");
+            
+            sb.AppendLine("\n**Товары:**");
+            int idx = 1;
             foreach (var item in order.Items)
             {
-                sb.AppendLine($"• {item.Product?.Name ?? "Неизвестный товар"}");
-                sb.AppendLine($"  Количество: {item.Quantity} {GetUnitDisplay(item.Unit)}");
-                sb.AppendLine($"  Цена за единицу: {item.UnitPrice:F2} ₽");
-                sb.AppendLine($"  Сумма: {item.TotalPrice:F2} ₽");
-                sb.AppendLine();
+                var unitReadable = GetUnitDisplay(item.Unit);
+                var posSum = item.Price * (decimal)item.Quantity;
+                sb.AppendLine($"{idx}. {item.Name} (ID:{item.ID}) — {item.Quantity} {unitReadable} × {item.Price:N2} = {posSum:N2} ₽");
+                idx++;
             }
             
-            sb.AppendLine($"💰 **ИТОГО: {order.TotalPrice:F2} ₽**");
+            sb.AppendLine($"\n💰 **Общая стоимость: {order.TotalPrice:N2} ₽**");
             
             return sb.ToString();
         }
@@ -113,8 +120,10 @@ namespace TMKMiniApp.Services
         {
             return unit switch
             {
-                "м" => "метр",
-                "т" => "тонна",
+                "m" => "метров",
+                "т" => "тонн",
+                "t" => "тонн",
+                "м" => "метров",
                 _ => "шт"
             };
         }

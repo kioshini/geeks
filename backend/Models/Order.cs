@@ -9,7 +9,7 @@ namespace TMKMiniApp.Models
     /// </summary>
     public class Order
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         
         [Required]
         public long UserId { get; set; }
@@ -40,11 +40,24 @@ namespace TMKMiniApp.Models
         [JsonPropertyName("Email")]
         public string Email { get; set; } = string.Empty;
         
+        // Дополнительные поля, которые заказчик может указать
+        [JsonPropertyName("Comment")]
+        public string? Comment { get; set; }              // примечание клиента
+        
+        [JsonPropertyName("DeliveryAddress")]
+        public string? DeliveryAddress { get; set; }      // адрес доставки
+        
+        [JsonPropertyName("PreferredDeliveryDate")]
+        public DateTime? PreferredDeliveryDate { get; set; } // желаемая дата доставки
+        
+        [JsonPropertyName("PaymentMethod")]
+        public string? PaymentMethod { get; set; }
+        
         [JsonPropertyName("OrderedItems")]
         public List<OrderItem> Items { get; set; } = new List<OrderItem>();
         
         [JsonPropertyName("TotalPrice")]
-        public decimal TotalPrice => Items.Sum(i => i.TotalPrice);
+        public decimal TotalPrice { get; set; }
         
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         

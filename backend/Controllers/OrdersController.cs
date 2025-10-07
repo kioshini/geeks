@@ -115,7 +115,9 @@ namespace TMKMiniApp.Controllers
                 }
 
                 var order = await _orderService.CreateOrderFromRequestAsync(orderRequest);
-                return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+                
+                // Возвращаем успешный ответ
+                return Ok(new { success = true, orderId = order.Id });
             }
             catch (ArgumentException ex)
             {

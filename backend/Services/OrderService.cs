@@ -110,9 +110,9 @@ namespace TMKMiniApp.Services
 
             foreach (var itemDto in orderRequest.OrderedItems)
             {
-                var product = await _productService.GetProductByIdAsync(int.Parse(itemDto.ProductId));
+                var product = await _productService.GetProductByIdAsync(int.Parse(itemDto.ID));
                 if (product == null)
-                    throw new ArgumentException($"Товар с ID {itemDto.ProductId} не найден");
+                    throw new ArgumentException($"Товар с ID {itemDto.ID} не найден");
 
                 if (!product.IsAvailable)
                     throw new InvalidOperationException($"Товар {product.Name} недоступен");
@@ -123,29 +123,35 @@ namespace TMKMiniApp.Services
                 var orderItem = new OrderItem
                 {
                     Id = orderItemId++,
-                    ProductId = itemDto.ProductId,
+                    ID = itemDto.ID,
+                    Name = itemDto.Name ?? product.Name ?? $"[ID:{itemDto.ID}] (название не найдено)",
                     Quantity = itemDto.Quantity,
                     Unit = itemDto.Unit,
-                    UnitPrice = itemDto.UnitPrice,
+                    Price = itemDto.Price,
                     CreatedAt = DateTime.UtcNow
                 };
 
                 orderItems.Add(orderItem);
 
                 // Обновляем остатки на складе
-                await _productService.UpdateStockAsync(int.Parse(itemDto.ProductId), product.StockQuantity - itemDto.Quantity);
+                await _productService.UpdateStockAsync(int.Parse(itemDto.ID), product.StockQuantity - (int)itemDto.Quantity);
             }
 
             var order = new Order
             {
-                Id = _nextOrderId++,
+                Id = Guid.NewGuid(),
                 UserId = 1, // Временное значение, в реальном приложении получать из контекста пользователя
                 FirstName = orderRequest.FirstName,
                 LastName = orderRequest.LastName,
                 INN = orderRequest.INN,
                 Phone = orderRequest.Phone,
                 Email = orderRequest.Email,
+                Comment = orderRequest.Comment,
+                DeliveryAddress = orderRequest.DeliveryAddress,
+                PreferredDeliveryDate = orderRequest.PreferredDeliveryDate,
+                PaymentMethod = orderRequest.PaymentMethod,
                 Items = orderItems,
+                TotalPrice = orderItems.Sum(x => x.Price * (decimal)x.Quantity),
                 Status = OrderStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

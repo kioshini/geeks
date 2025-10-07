@@ -35,6 +35,19 @@ namespace TMKMiniApp.Models.OrderModels
         [JsonPropertyName("Email")]
         public string Email { get; set; } = string.Empty;
 
+        // Дополнительные поля
+        [JsonPropertyName("Comment")]
+        public string? Comment { get; set; }
+
+        [JsonPropertyName("DeliveryAddress")]
+        public string? DeliveryAddress { get; set; }
+
+        [JsonPropertyName("PreferredDeliveryDate")]
+        public DateTime? PreferredDeliveryDate { get; set; }
+
+        [JsonPropertyName("PaymentMethod")]
+        public string? PaymentMethod { get; set; }
+
         [Required(ErrorMessage = "Список товаров обязателен")]
         [MinLength(1, ErrorMessage = "Заказ должен содержать хотя бы один товар")]
         [JsonPropertyName("OrderedItems")]
@@ -50,20 +63,23 @@ namespace TMKMiniApp.Models.OrderModels
     public class OrderedItem
     {
         [Required(ErrorMessage = "ID товара обязателен")]
-        [JsonPropertyName("ProductId")]
-        public string ProductId { get; set; } = string.Empty;
+        [JsonPropertyName("ID")]
+        public string ID { get; set; } = string.Empty;
+
+        [JsonPropertyName("Name")]
+        public string? Name { get; set; }
 
         [Required(ErrorMessage = "Количество обязательно")]
-        [Range(1, int.MaxValue, ErrorMessage = "Количество должно быть больше 0")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Количество должно быть больше 0")]
         [JsonPropertyName("Quantity")]
-        public int Quantity { get; set; }
+        public double Quantity { get; set; }
 
         [Required(ErrorMessage = "Единица измерения обязательна")]
         [JsonPropertyName("Unit")]
-        public string Unit { get; set; } = string.Empty; // "т" или "м"
+        public string Unit { get; set; } = string.Empty; // "m" или "t"
 
-        [JsonPropertyName("UnitPrice")]
-        public decimal UnitPrice { get; set; }
+        [JsonPropertyName("Price")]
+        public decimal Price { get; set; }
 
         [JsonPropertyName("TotalPrice")]
         public decimal TotalPrice { get; set; }

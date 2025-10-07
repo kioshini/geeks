@@ -180,11 +180,16 @@ export type OrderRequest = {
 	INN: string;
 	phone: string;
 	email: string;
+	comment?: string;
+	deliveryAddress?: string;
+	preferredDeliveryDate?: string;
+	paymentMethod?: string;
 	OrderedItems: Array<{
-		productId: string;
+		ID: string;
+		Name?: string;
 		quantity: number;
 		unit: string;
-		unitPrice: number;
+		price: number;
 	}>;
 };
 export type OrderDto = {

@@ -12,26 +12,26 @@ namespace TMKMiniApp.Models
         public int Id { get; set; }
         
         [Required]
-        [JsonPropertyName("ProductId")]
-        public string ProductId { get; set; } = string.Empty;
+        [JsonPropertyName("ID")]
+        public string ID { get; set; } = string.Empty; // ID - ссылка на Nomenclature.ID (string)
         
-        public Product? Product { get; set; }
+        [JsonPropertyName("Name")]
+        public string Name { get; set; } = string.Empty; // ОБЯЗАТЕЛЬНО: при формировании заказа заполнить из каталога
         
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Количество должно быть больше 0")]
         [JsonPropertyName("Quantity")]
-        public int Quantity { get; set; }
+        public double Quantity { get; set; }
         
         [Required]
         [JsonPropertyName("Unit")]
-        public string Unit { get; set; } = string.Empty; // "т" или "м"
+        public string Unit { get; set; } = string.Empty; // "m" или "t"
         
         [Required]
-        [JsonPropertyName("UnitPrice")]
-        public decimal UnitPrice { get; set; }
+        [JsonPropertyName("Price")]
+        public decimal Price { get; set; } // цена за единицу в выбранной единице
         
         [JsonPropertyName("TotalPrice")]
-        public decimal TotalPrice => UnitPrice * Quantity;
+        public decimal TotalPrice => Price * (decimal)Quantity;
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

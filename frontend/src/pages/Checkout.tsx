@@ -10,7 +10,10 @@ export function CheckoutPage() {
 	const [inn, setInn] = useState('');
 	const [phone, setPhone] = useState('');
 	const [email, setEmail] = useState('');
-	const [notes, setNotes] = useState('');
+	const [comment, setComment] = useState('');
+	const [deliveryAddress, setDeliveryAddress] = useState('');
+	const [preferredDeliveryDate, setPreferredDeliveryDate] = useState('');
+	const [paymentMethod, setPaymentMethod] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 	const [human, setHuman] = useState(false);
@@ -89,11 +92,16 @@ export function CheckoutPage() {
 				INN: inn.trim().replace(/\D/g, ''), // Убираем все нецифровые символы
 				phone: phone.trim(),
 				email: email.trim(),
+				comment: comment.trim() || undefined,
+				deliveryAddress: deliveryAddress.trim() || undefined,
+				preferredDeliveryDate: preferredDeliveryDate || undefined,
+				paymentMethod: paymentMethod.trim() || undefined,
 				OrderedItems: cart.items.map(i => ({
-					productId: i.productId.toString(),
+					ID: i.productId.toString(),
+					Name: i.product?.name,
 					quantity: i.quantity,
 					unit: i.unit, // Используем единицу измерения из корзины
-					unitPrice: i.product?.price || 0
+					price: i.price
 				}))
 			};
 
@@ -111,11 +119,27 @@ export function CheckoutPage() {
 				throw new Error(errorData.message || 'Ошибка при создании заказа');
 			}
 
-			const order = await response.json();
-			setMessage(`Заказ #${order.id} создан на сумму ${order.totalPrice.toFixed(2)} ₽`);
-			
-			// Очищаем корзину после успешного заказа
-			// cart.clear(); // Если есть метод очистки корзины
+			const data = await response.json();
+			if (data.success) {
+				// Очищаем форму
+				setFirstName('');
+				setLastName('');
+				setInn('');
+				setPhone('');
+				setEmail('');
+				setComment('');
+				setDeliveryAddress('');
+				setPreferredDeliveryDate('');
+				setPaymentMethod('');
+				setHuman(false);
+				
+				// Очищаем корзину
+				// TODO: Добавить метод очистки корзины в store
+				
+				setMessage(`Заказ #${data.orderId} успешно отправлен!`);
+			} else {
+				setMessage('Ошибка при отправке заказа. Попробуйте позже.');
+			}
 		} catch (e: any) {
 			setMessage(e?.message || 'Ошибка при оформлении заказа');
 		} finally {
@@ -289,15 +313,54 @@ export function CheckoutPage() {
 						</svg>
 						Дополнительно
 					</h2>
-					<div>
-						<label className="block text-sm font-bold text-gray-700 mb-2">Комментарий к заказу</label>
-						<textarea 
-							value={notes} 
-							onChange={e => setNotes(e.target.value)} 
-							placeholder="Особые требования, адрес доставки и т.д." 
-							rows={4}
-							className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-200"
-						/>
+					<div className="space-y-6">
+						<div>
+							<label className="block text-sm font-bold text-gray-700 mb-2">Комментарий к заказу</label>
+							<textarea 
+								value={comment} 
+								onChange={e => setComment(e.target.value)} 
+								placeholder="Особые требования, пожелания и т.д." 
+								rows={3}
+								className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-200"
+							/>
+						</div>
+						
+						<div>
+							<label className="block text-sm font-bold text-gray-700 mb-2">Адрес доставки</label>
+							<input 
+								value={deliveryAddress} 
+								onChange={e => setDeliveryAddress(e.target.value)} 
+								placeholder="Укажите адрес доставки" 
+								className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+							/>
+						</div>
+						
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<label className="block text-sm font-bold text-gray-700 mb-2">Желаемая дата доставки</label>
+								<input 
+									type="date"
+									value={preferredDeliveryDate} 
+									onChange={e => setPreferredDeliveryDate(e.target.value)} 
+									className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+								/>
+							</div>
+							
+							<div>
+								<label className="block text-sm font-bold text-gray-700 mb-2">Способ оплаты</label>
+								<select 
+									value={paymentMethod} 
+									onChange={e => setPaymentMethod(e.target.value)} 
+									className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+								>
+									<option value="">Выберите способ оплаты</option>
+									<option value="cash">Наличные</option>
+									<option value="card">Банковская карта</option>
+									<option value="transfer">Банковский перевод</option>
+									<option value="other">Другое</option>
+								</select>
+							</div>
+						</div>
 					</div>
 				</div>
 
