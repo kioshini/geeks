@@ -10,7 +10,7 @@ import {
   getUpdatedProductsWithDeltas
 } from '../lib/jsonDataAdapter';
 import { deltaUpdatesService } from '../lib/deltaUpdatesService';
-import { useUnit } from '../contexts/UnitContext';
+import { useUnit } from '../hooks/useUnit';
 import type { Product, CartItem } from '../types/catalog';
 import type { PricesEl, RemnantsEl } from '../lib/api';
 
@@ -52,7 +52,7 @@ export function CatalogPage() {
       });
 
       // Преобразуем JSON данные в товары каталога
-      const adaptedProducts = adaptJsonDataToProducts(nomenclature, prices, remnants, stocks, types);
+      const adaptedProducts = adaptJsonDataToProducts(nomenclature, prices, remnants, stocks);
       setProducts(adaptedProducts);
       
       console.log(`Преобразовано ${adaptedProducts.length} товаров из JSON данных`);
@@ -108,7 +108,11 @@ export function CatalogPage() {
     let uid: number | null = tgUser?.id ?? (demoStored ? Number(demoStored) : null);
     if (!uid) {
       uid = 999001; // demo user id
-      try { window.localStorage.setItem('demoUserId', String(uid)); } catch {}
+      try { 
+        window.localStorage.setItem('demoUserId', String(uid)); 
+      } catch (error) {
+        console.warn('Failed to save demo user ID to localStorage:', error);
+      }
     }
     setUserId(uid);
 

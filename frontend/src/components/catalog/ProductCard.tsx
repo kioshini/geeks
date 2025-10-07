@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus, Minus, ShoppingCart, MapPin } from 'lucide-react';
 import type { ProductCardProps } from '../../types/catalog';
-import { useUnit } from '../../contexts/UnitContext';
+import { useUnit } from '../../hooks/useUnit';
 
 /**
  * Компонент карточки товара с поддержкой режимов сетки и списка

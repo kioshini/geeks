@@ -3,7 +3,7 @@ import { Telegram } from '../lib/telegram';
 import { useEffect, useState } from 'react';
 import { useCartStore } from '../store/cart';
 import { UnitToggle } from '../components/UnitToggle';
-import { useUnit } from '../contexts/UnitContext';
+import { useUnit } from '../hooks/useUnit';
 import { CartIcon } from '../components/catalog/CartIcon';
 import { Menu, X } from 'lucide-react';
 
@@ -27,11 +27,15 @@ export function AppLayout() {
         let uid: number | null = tgUser?.id ?? (demoStored ? Number(demoStored) : null);
         if (!uid) {
             uid = 999001; // demo user id
-            try { window.localStorage.setItem('demoUserId', String(uid)); } catch {}
+            try { 
+                window.localStorage.setItem('demoUserId', String(uid)); 
+            } catch (error) {
+                console.warn('Failed to save demo user ID to localStorage:', error);
+            }
         }
         setUserId(uid);
         loadCart();
-	}, []);
+	}, [loadCart, setUserId]);
 
 	return (
 		<div className="min-h-screen bg-gray-100 flex flex-col">

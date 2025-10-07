@@ -14,7 +14,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import type { ProductModalProps } from '../../types/catalog';
-import { useUnit } from '../../contexts/UnitContext';
+import { useUnit } from '../../hooks/useUnit';
 
 /**
  * Модальное окно с подробной информацией о товаре

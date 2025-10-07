@@ -1,7 +1,5 @@
 // import { useState } from 'react';
-
-/** Available units of measurement */
-export type Unit = 'м' | 'т';
+import type { Unit } from '../types/units';
 
 /**
  * Props for UnitToggle component

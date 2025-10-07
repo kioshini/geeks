@@ -1,13 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
-
-export type Unit = 'м' | 'т';
-
-interface UnitContextType {
-  selectedUnit: Unit;
-  setSelectedUnit: (unit: Unit) => void;
-}
-
-const UnitContext = createContext<UnitContextType | undefined>(undefined);
+import { useState, type ReactNode } from 'react';
+import type { Unit } from '../types/units';
+import { UnitContext } from './UnitContextValue';
 
 interface UnitProviderProps {
   children: ReactNode;
@@ -28,10 +21,3 @@ export function UnitProvider({ children }: UnitProviderProps) {
   );
 }
 
-export function useUnit() {
-  const context = useContext(UnitContext);
-  if (context === undefined) {
-    throw new Error('useUnit must be used within a UnitProvider');
-  }
-  return context;
-}

@@ -4,7 +4,7 @@ import { Grid, List, Search, Filter, X } from 'lucide-react';
 import type { CatalogProps, Product, ViewMode } from '../../types/catalog';
 import { ProductCard } from './ProductCard';
 import { ProductModal } from './ProductModal';
-import { useUnit } from '../../contexts/UnitContext';
+import { useUnit } from '../../hooks/useUnit';
 
 /**
  * Основной компонент каталога товаров с переключением режимов отображения

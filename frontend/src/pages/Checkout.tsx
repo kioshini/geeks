@@ -48,7 +48,7 @@ export function CheckoutPage() {
 
 		if (!phone.trim()) {
 			newErrors.phone = 'Телефон обязателен';
-		} else if (!/^(\+7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/.test(phone.trim())) {
+		} else if (!/^(\+7|8)?[\s-]?\(?[489][0-9]{2}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/.test(phone.trim())) {
 			newErrors.phone = 'Неверный формат телефона';
 		}
 
@@ -131,8 +131,9 @@ export function CheckoutPage() {
 			} else {
 				setMessage('Ошибка при отправке заказа. Попробуйте позже.');
 			}
-		} catch (e: any) {
-			setMessage(e?.message || 'Ошибка при оформлении заказа');
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Ошибка при оформлении заказа';
+			setMessage(errorMessage);
 		} finally {
 			setLoading(false);
 		}

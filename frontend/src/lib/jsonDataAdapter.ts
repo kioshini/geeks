@@ -3,12 +3,10 @@ import type {
   PricesEl, 
   RemnantsEl, 
   StockEl, 
-  TypeEl,
   NomenclatureRoot,
   PricesRoot,
   RemnantsRoot,
-  StocksRoot,
-  TypesRoot
+  StocksRoot
 } from './api';
 import type { Product } from '../types/catalog';
 
@@ -33,8 +31,7 @@ export function updateJsonDataCache(
   nomenclature: NomenclatureEl[],
   prices: PricesEl[],
   remnants: RemnantsEl[],
-  stocks: StockEl[],
-  _types: TypeEl[] // Пока не используется
+  stocks: StockEl[]
 ) {
   nomenclatureCache = nomenclature;
   pricesCache = prices;
@@ -179,16 +176,14 @@ export function adaptJsonDataToProducts(
   nomenclatureRoot: NomenclatureRoot,
   pricesRoot: PricesRoot,
   remnantsRoot: RemnantsRoot,
-  stocksRoot: StocksRoot,
-  typesRoot: TypesRoot
+  stocksRoot: StocksRoot
 ): Product[] {
   // Обновляем кэш
   updateJsonDataCache(
     nomenclatureRoot.ArrayOfNomenclatureEl,
     pricesRoot.ArrayOfPricesEl,
     remnantsRoot.ArrayOfRemnantsEl,
-    stocksRoot.ArrayOfStockEl,
-    typesRoot.ArrayOfTypeEl
+    stocksRoot.ArrayOfStockEl
   );
 
   // Преобразуем номенклатуру в товары

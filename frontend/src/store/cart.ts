@@ -32,8 +32,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			const cart = await Api.getCart(userId);
 			set({ cart });
-		} catch (e: any) {
-			set({ error: e?.message || 'Failed to load cart' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to load cart';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}
@@ -46,8 +47,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			await Api.addToCart(userId, dto);
 			await get().loadCart();
-		} catch (e: any) {
-			set({ error: e?.response?.data || e?.message || 'Failed to add to cart' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to add to cart';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}
@@ -60,8 +62,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			await Api.updateCartItem(userId, itemId, dto);
 			await get().loadCart();
-		} catch (e: any) {
-			set({ error: e?.response?.data || e?.message || 'Failed to update cart item' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to update cart item';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}
@@ -74,8 +77,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			await Api.updateCartItemByProductId(userId, productId, dto);
 			await get().loadCart();
-		} catch (e: any) {
-			set({ error: e?.response?.data || e?.message || 'Failed to update cart item' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to update cart item';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}
@@ -88,8 +92,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			await Api.removeFromCart(userId, itemId);
 			await get().loadCart();
-		} catch (e: any) {
-			set({ error: e?.response?.data || e?.message || 'Failed to remove from cart' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to remove from cart';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}
@@ -102,8 +107,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			await Api.removeFromCartByProductId(userId, productId);
 			await get().loadCart();
-		} catch (e: any) {
-			set({ error: e?.response?.data || e?.message || 'Failed to remove from cart' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to remove from cart';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}
@@ -116,8 +122,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 		try {
 			await Api.clearCart(userId);
 			await get().loadCart();
-		} catch (e: any) {
-			set({ error: e?.response?.data || e?.message || 'Failed to clear cart' });
+		} catch (e: unknown) {
+			const errorMessage = e instanceof Error ? e.message : 'Failed to clear cart';
+			set({ error: errorMessage });
 		} finally {
 			set({ loading: false });
 		}

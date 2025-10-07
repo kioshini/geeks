@@ -1,5 +1,5 @@
 import type { ProductDto } from '../lib/api';
-import { useUnit } from '../contexts/UnitContext';
+import { useUnit } from '../hooks/useUnit';
 
 /**
  * Props for ProductCard component
