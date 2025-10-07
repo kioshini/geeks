@@ -236,13 +236,13 @@ namespace TMKMiniApp.Services
         {
             try
             {
-                // Абсолютные пути к файлам на хосте
-                var root = "/home/kioshi/apps/RealHackaton";
-                var nomenclaturePath = Path.Combine(root, "nomenclature.json");
-                var typesPath = Path.Combine(root, "types.json");
-                var pricesPath = Path.Combine(root, "prices.json");
-                var remnantsPath = Path.Combine(root, "remnants.json");
-                var stocksPath = Path.Combine(root, "stocks.json");
+                // Пути к файлам в папке Data
+                var root = "/home/kioshi/apps/RealHackaton/backend";
+                var nomenclaturePath = Path.Combine(root, "Data", "nomenclature.json");
+                var typesPath = Path.Combine(root, "Data", "types.json");
+                var pricesPath = Path.Combine(root, "Data", "prices.json");
+                var remnantsPath = Path.Combine(root, "Data", "remnants.json");
+                var stocksPath = Path.Combine(root, "Data", "stocks.json");
 
                 if (!File.Exists(nomenclaturePath))
                 {
