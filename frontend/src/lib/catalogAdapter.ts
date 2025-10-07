@@ -9,9 +9,9 @@ export function adaptProductDtoToProduct(dto: ProductDto): Product {
   return {
     id: dto.id.toString(),
     name: dto.name,
-    gost: dto.gost || 'Не указан',
-    manufacturer: dto.manufacturer || 'Не указан',
-    steelGrade: dto.steelGrade || 'Не указан',
+    gost: 'Не указан', // Заглушка, так как gost нет в ProductDto
+    manufacturer: 'Не указан', // Заглушка, так как manufacturer нет в ProductDto
+    steelGrade: dto.material || 'Не указан',
     diameter: dto.diameter || 0,
     pipeWallThickness: dto.thickness || 0,
     inStockT: dto.stockQuantity || 0,

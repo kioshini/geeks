@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TMKMiniApp.Models.DTOs;
+using TMKMiniApp.Models.OrderModels;
 using TMKMiniApp.Services;
+using TMKMiniApp.Validators;
+using FluentValidation;
 
 namespace TMKMiniApp.Controllers
 {
@@ -10,11 +13,13 @@ namespace TMKMiniApp.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly ILogger<OrdersController> _logger;
+        private readonly OrderRequestValidator _orderRequestValidator;
 
-        public OrdersController(IOrderService orderService, ILogger<OrdersController> logger)
+        public OrdersController(IOrderService orderService, ILogger<OrdersController> logger, OrderRequestValidator orderRequestValidator)
         {
             _orderService = orderService;
             _logger = logger;
+            _orderRequestValidator = orderRequestValidator;
         }
 
         /// <summary>
@@ -75,17 +80,26 @@ namespace TMKMiniApp.Controllers
         }
 
         /// <summary>
-        /// Создать новый заказ
+        /// Создать новый заказ с валидацией
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<OrderDto>> CreateOrder(CreateOrderDto createOrderDto)
+        public async Task<ActionResult<OrderDto>> CreateOrder(OrderRequest orderRequest)
         {
             try
             {
+                // Валидация с помощью FluentValidation
+                var validationResult = await _orderRequestValidator.ValidateAsync(orderRequest);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => new { Field = e.PropertyName, Message = e.ErrorMessage });
+                    return BadRequest(new { Message = "Ошибки валидации", Errors = errors });
+                }
+
+                // Дополнительная валидация ModelState
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var order = await _orderService.CreateOrderAsync(createOrderDto);
+                var order = await _orderService.CreateOrderFromRequestAsync(orderRequest);
                 return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
             }
             catch (ArgumentException ex)

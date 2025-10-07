@@ -22,7 +22,7 @@ namespace TMKMiniApp.Models.DTOs
     public class OrderItemDto
     {
         public int Id { get; set; }
-        public int ProductId { get; set; }
+        public string ProductId { get; set; } = string.Empty;
         public ProductDto? Product { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
@@ -56,7 +56,7 @@ namespace TMKMiniApp.Models.DTOs
     public class CreateOrderItemDto
     {
         [Required]
-        public int ProductId { get; set; }
+        public string ProductId { get; set; } = string.Empty;
         
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Количество должно быть больше 0")]

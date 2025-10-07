@@ -40,7 +40,9 @@ namespace TMKMiniApp.Validators
                 .ChildRules(item =>
                 {
                     item.RuleFor(i => i.ProductId)
-                        .GreaterThan(0).WithMessage("ID продукта должен быть больше 0");
+                        .NotEmpty().WithMessage("ID продукта обязателен")
+                        .Must(id => int.TryParse(id, out int productId) && productId > 0)
+                        .WithMessage("ID продукта должен быть положительным числом");
                     
                     item.RuleFor(i => i.Quantity)
                         .GreaterThan(0).WithMessage("Количество должно быть больше 0")

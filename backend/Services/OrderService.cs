@@ -1,5 +1,6 @@
 using TMKMiniApp.Models;
 using TMKMiniApp.Models.DTOs;
+using TMKMiniApp.Models.OrderModels;
 
 namespace TMKMiniApp.Services
 {
@@ -41,7 +42,8 @@ namespace TMKMiniApp.Services
 
             foreach (var itemDto in createOrderDto.Items)
             {
-                var product = await _productService.GetProductByIdAsync(itemDto.ProductId);
+                var product = await _productService.GetProductByIdAsync(int.Parse(itemDto.ProductId));
+                
                 if (product == null)
                     throw new ArgumentException($"Товар с ID {itemDto.ProductId} не найден");
 
@@ -56,14 +58,15 @@ namespace TMKMiniApp.Services
                     Id = orderItemId++,
                     ProductId = itemDto.ProductId,
                     Quantity = itemDto.Quantity,
-                    Price = product.Price,
+                    UnitPrice = product.Price,
+                    Unit = "шт", // По умолчанию
                     CreatedAt = DateTime.UtcNow
                 };
 
                 orderItems.Add(orderItem);
 
                 // Обновляем остатки на складе
-                await _productService.UpdateStockAsync(itemDto.ProductId, product.StockQuantity - itemDto.Quantity);
+                await _productService.UpdateStockAsync(int.Parse(itemDto.ProductId), product.StockQuantity - itemDto.Quantity);
             }
 
             var order = new Order
@@ -78,6 +81,58 @@ namespace TMKMiniApp.Services
                 Items = orderItems,
                 Status = OrderStatus.Pending,
                 Notes = createOrderDto.Notes,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _orders.Add(order);
+            return await MapToDtoAsync(order);
+        }
+
+        public async Task<OrderDto> CreateOrderFromRequestAsync(OrderRequest orderRequest)
+        {
+            var orderItems = new List<OrderItem>();
+            var orderItemId = 1;
+
+            foreach (var itemDto in orderRequest.OrderedItems)
+            {
+                var product = await _productService.GetProductByIdAsync(int.Parse(itemDto.ProductId));
+                if (product == null)
+                    throw new ArgumentException($"Товар с ID {itemDto.ProductId} не найден");
+
+                if (!product.IsAvailable)
+                    throw new InvalidOperationException($"Товар {product.Name} недоступен");
+
+                if (itemDto.Quantity > product.StockQuantity)
+                    throw new InvalidOperationException($"Недостаточно товара {product.Name} на складе");
+
+                var orderItem = new OrderItem
+                {
+                    Id = orderItemId++,
+                    ProductId = itemDto.ProductId,
+                    Quantity = itemDto.Quantity,
+                    Unit = itemDto.Unit,
+                    UnitPrice = itemDto.UnitPrice,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                orderItems.Add(orderItem);
+
+                // Обновляем остатки на складе
+                await _productService.UpdateStockAsync(int.Parse(itemDto.ProductId), product.StockQuantity - itemDto.Quantity);
+            }
+
+            var order = new Order
+            {
+                Id = _nextOrderId++,
+                UserId = 1, // Временное значение, в реальном приложении получать из контекста пользователя
+                FirstName = orderRequest.FirstName,
+                LastName = orderRequest.LastName,
+                INN = orderRequest.INN,
+                Phone = orderRequest.Phone,
+                Email = orderRequest.Email,
+                Items = orderItems,
+                Status = OrderStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -153,14 +208,14 @@ namespace TMKMiniApp.Services
 
             foreach (var item in order.Items)
             {
-                var product = await _productService.GetProductByIdAsync(item.ProductId);
+                var product = await _productService.GetProductByIdAsync(int.Parse(item.ProductId));
                 orderItemDtos.Add(new OrderItemDto
                 {
                     Id = item.Id,
                     ProductId = item.ProductId,
                     Product = product,
                     Quantity = item.Quantity,
-                    Price = item.Price,
+                    Price = item.UnitPrice,
                     TotalPrice = item.TotalPrice
                 });
             }

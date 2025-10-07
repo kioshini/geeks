@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { ShoppingCart } from 'lucide-react';
 import type { CartIconProps } from '../../types/catalog';
 

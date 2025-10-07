@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Minus, ShoppingCart, MapPin } from 'lucide-react';
 import type { ProductCardProps } from '../../types/catalog';
+import { useUnit } from '../../contexts/UnitContext';
 
 /**
  * Компонент карточки товара с поддержкой режимов сетки и списка
@@ -18,6 +19,7 @@ export function ProductCard({
   onProductClick
 }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
+  const { selectedUnit } = useUnit();
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Не открываем модалку при клике на кнопки
@@ -90,36 +92,36 @@ export function ProductCard({
               </span>
             )}
           </div>
-          <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-dark mb-1 sm:mb-2 line-clamp-2">
+          <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-[#171A1F] mb-1 sm:mb-2 line-clamp-2">
             {product.name}
           </h3>
           
           {/* Основные характеристики */}
           <div className="space-y-0.5 sm:space-y-1 mb-2 sm:mb-3">
             <div className="flex items-center justify-between text-xs sm:text-sm">
-              <span className="text-grayDark">Диаметр:</span>
-              <span className="font-medium text-dark">{product.diameter} мм</span>
+              <span className="text-[#171A1F]">Диаметр:</span>
+              <span className="font-medium text-[#171A1F]">{product.diameter} мм</span>
             </div>
             <div className="flex items-center justify-between text-xs sm:text-sm">
-              <span className="text-grayDark">Толщина стенки:</span>
-              <span className="font-medium text-dark">{product.pipeWallThickness} мм</span>
+              <span className="text-[#171A1F]">Толщина стенки:</span>
+              <span className="font-medium text-[#171A1F]">{product.pipeWallThickness} мм</span>
             </div>
             <div className="flex items-center justify-between text-xs sm:text-sm">
-              <span className="text-grayDark">Марка стали:</span>
-              <span className="font-medium text-dark">{product.steelGrade}</span>
+              <span className="text-[#171A1F]">Марка стали:</span>
+              <span className="font-medium text-[#171A1F]">{product.steelGrade}</span>
             </div>
             <div className="flex items-center justify-between text-xs sm:text-sm">
-              <span className="text-grayDark">Производитель:</span>
-              <span className="font-medium text-dark">{product.manufacturer}</span>
+              <span className="text-[#171A1F]">Производитель:</span>
+              <span className="font-medium text-[#171A1F]">{product.manufacturer}</span>
             </div>
           </div>
 
           {/* Наличие */}
           <div className="flex items-center justify-between text-xs sm:text-sm mb-1 sm:mb-2">
-            <span className="text-grayDark">Наличие:</span>
+            <span className="text-[#565D6D]">Наличие:</span>
             <div className="flex gap-1 sm:gap-2">
               {product.inStockT > 0 && (
-                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-800 rounded text-xs">
+                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-[#22C55E] rounded text-xs">
                   {product.inStockT.toFixed(1)} т
                 </span>
               )}
@@ -132,26 +134,32 @@ export function ProductCard({
           </div>
 
           {/* Склад */}
-          <div className="flex items-center gap-1 text-xs text-grayDark mb-2">
+          <div className="flex items-center gap-1 text-xs text-[#565D6D] mb-2">
             <MapPin className="w-3 h-3" />
             <span className="truncate">{product.stockName}</span>
           </div>
         </div>
 
+        {/* Разделительная черта */}
+        <div className="border-b border-[#DEE1E6] mt-2 mb-2"></div>
+
         {/* Цены */}
         <div className="mb-2 sm:mb-4">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs sm:text-sm text-grayDark">Цена за тонну:</span>
-            <span className="text-sm sm:text-base lg:text-lg font-bold text-primary">
-              {product.priceT.toLocaleString('ru-RU')} ₽
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs sm:text-sm text-grayDark">Цена за метр:</span>
-            <span className="text-sm sm:text-base lg:text-lg font-bold text-primary">
-              {product.priceM.toLocaleString('ru-RU')} ₽
-            </span>
-          </div>
+          {selectedUnit === 'т' ? (
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm text-[#565D6D]">Цена за тонну:</span>
+              <span className="text-sm sm:text-base lg:text-lg font-medium text-[#171A1F]">
+                {product.priceT.toLocaleString('ru-RU')} ₽
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm text-[#565D6D]">Цена за метр:</span>
+              <span className="text-sm sm:text-base lg:text-lg font-medium text-[#E64A19]">
+                {product.priceM.toLocaleString('ru-RU')} ₽
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Кнопки управления корзиной */}
@@ -176,7 +184,7 @@ export function ProductCard({
                   value={quantity}
                   onChange={handleInputChange}
                   onClick={(e) => e.stopPropagation()}
-                  className="w-16 sm:w-16 text-center border border-grayLight rounded px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
+                  className="w-16 sm:w-16 text-center border border-[#DEE1E6] rounded-md px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
                   min="1"
                   max="999"
                 />
@@ -198,7 +206,7 @@ export function ProductCard({
                   handleAddToCart();
                 }}
                 disabled={!isInStock}
-                className="w-full bg-primary hover:bg-primaryDark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 touch-manipulation"
+                className="w-full bg-[#171A1F] hover:bg-[#1F1A1F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 sm:py-2 px-4 rounded-md transition flex items-center justify-center gap-2 touch-manipulation"
               >
                 <ShoppingCart className="w-5 h-5 sm:w-4 sm:h-4" />
                 <span className="text-sm sm:text-base">{isInStock ? 'Добавить в корзину' : 'Нет в наличии'}</span>
@@ -231,7 +239,7 @@ export function ProductCard({
                     onUpdateQuantity(product.id, Math.max(1, Math.min(999, value)));
                   }}
                   onClick={(e) => e.stopPropagation()}
-                  className="w-16 text-center border border-grayLight rounded px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
+                  className="w-16 text-center border border-[#DEE1E6] rounded-md px-2 py-2 sm:py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
                   min="1"
                   max="999"
                 />
@@ -252,9 +260,9 @@ export function ProductCard({
                   e.stopPropagation();
                   onRemoveFromCart(product.id);
                 }}
-                className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 sm:py-2 px-4 rounded-lg transition-colors duration-200 touch-manipulation"
+                className="w-full bg-[#F44336] hover:bg-red-600 text-white font-medium py-3 sm:py-2 px-4 rounded-md transition touch-manipulation"
               >
-                <span className="text-sm sm:text-base">Удалить из корзины</span>
+                <span className="text-sm sm:text-base">Убрать из корзины</span>
               </button>
             </div>
           )}

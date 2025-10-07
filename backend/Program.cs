@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using TMKMiniApp.Validators;
+using TMKMiniApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,8 @@ builder.Services.AddSingleton<IProductService, ProductService>();
 builder.Services.AddSingleton<ICartService, CartService>();
 builder.Services.AddSingleton<IOrderService, OrderService>();
 builder.Services.AddSingleton<IDataSyncService, DataSyncService>();
+builder.Services.AddSingleton<JsonDataService>();
+builder.Services.AddScoped<TMKMiniApp.Validators.OrderRequestValidator>();
 
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductDtoValidator>();
@@ -117,5 +120,7 @@ app.Use(async (context, next) =>
 
 app.UseAuthorization();
 app.MapControllers();
+
+// Тест десериализации удален - используется API endpoint /api/jsondata/validate
 
 app.Run();

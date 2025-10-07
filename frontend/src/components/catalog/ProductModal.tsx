@@ -14,6 +14,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import type { ProductModalProps } from '../../types/catalog';
+import { useUnit } from '../../contexts/UnitContext';
 
 /**
  * Модальное окно с подробной информацией о товаре
@@ -31,6 +32,7 @@ export function ProductModal({
   onUpdateQuantity
 }: ProductModalProps) {
   const [quantity, setQuantity] = useState(1);
+  const { selectedUnit } = useUnit();
 
   // Сброс количества при открытии модалки
   useEffect(() => {
@@ -115,7 +117,7 @@ export function ProductModal({
           >
             {/* Заголовок модалки */}
             <div className="flex items-center justify-between p-3 sm:p-6 border-b border-grayLight">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-dark">Информация о товаре</h2>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#171A1F]">Информация о товаре</h2>
               <button
                 onClick={onClose}
                 className="text-grayDark hover:text-dark transition-colors p-2 hover:bg-grayLight rounded-full"
@@ -147,10 +149,10 @@ export function ProductModal({
                   {/* Основная информация */}
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-2xl font-bold text-dark mb-2">
+                      <h3 className="text-2xl font-bold text-[#171A1F] mb-2">
                         {product.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-grayDark">
+                      <div className="flex items-center gap-2 text-[#565D6D]">
                         <Building className="w-4 h-4" />
                         <span>{product.manufacturer}</span>
                       </div>
@@ -158,20 +160,23 @@ export function ProductModal({
 
                     {/* Цены */}
                     <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
-                      <h4 className="text-lg font-semibold text-dark mb-3">Цены</h4>
+                      <h4 className="text-lg font-semibold text-[#171A1F] mb-3">Цены</h4>
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-grayDark">За тонну:</span>
-                          <span className="text-xl font-bold text-primary">
-                            {product.priceT.toLocaleString('ru-RU')} ₽
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-grayDark">За метр:</span>
-                          <span className="text-xl font-bold text-primary">
-                            {product.priceM.toLocaleString('ru-RU')} ₽
-                          </span>
-                        </div>
+                        {selectedUnit === 'т' ? (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#565D6D]">За тонну:</span>
+                            <span className="text-xl font-medium text-[#171A1F]">
+                              {product.priceT.toLocaleString('ru-RU')} ₽
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#565D6D]">За метр:</span>
+                            <span className="text-xl font-medium text-[#E64A19]">
+                              {product.priceM.toLocaleString('ru-RU')} ₽
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -181,45 +186,45 @@ export function ProductModal({
                 <div className="space-y-6">
                   {/* Технические характеристики */}
                   <div>
-                    <h4 className="text-lg font-semibold text-dark mb-4 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-[#171A1F] mb-4 flex items-center gap-2">
                       <Ruler className="w-5 h-5" />
                       Технические характеристики
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <div>
-                          <span className="text-sm text-grayDark">ГОСТ:</span>
-                          <p className="font-medium text-dark">{product.gost}</p>
+                          <span className="text-sm text-[#171A1F]">ГОСТ:</span>
+                          <p className="font-medium text-[#171A1F]">{product.gost}</p>
                         </div>
                         <div>
-                          <span className="text-sm text-grayDark">Диаметр:</span>
-                          <p className="font-medium text-dark">{product.diameter} мм</p>
+                          <span className="text-sm text-[#171A1F]">Диаметр:</span>
+                          <p className="font-medium text-[#171A1F]">{product.diameter} мм</p>
                         </div>
                         <div>
-                          <span className="text-sm text-grayDark">Толщина стенки:</span>
-                          <p className="font-medium text-dark">{product.pipeWallThickness} мм</p>
+                          <span className="text-sm text-[#171A1F]">Толщина стенки:</span>
+                          <p className="font-medium text-[#171A1F]">{product.pipeWallThickness} мм</p>
                         </div>
                         <div>
-                          <span className="text-sm text-grayDark">Марка стали:</span>
-                          <p className="font-medium text-dark">{product.steelGrade}</p>
+                          <span className="text-sm text-[#171A1F]">Марка стали:</span>
+                          <p className="font-medium text-[#171A1F]">{product.steelGrade}</p>
                         </div>
                       </div>
                       <div className="space-y-3">
                         <div>
-                          <span className="text-sm text-gray-600">Форма длины:</span>
-                          <p className="font-medium">{product.formOfLength}</p>
+                          <span className="text-sm text-[#565D6D]">Форма длины:</span>
+                          <p className="font-medium text-[#171A1F]">{product.formOfLength}</p>
                         </div>
                         <div>
-                          <span className="text-sm text-gray-600">Средняя длина трубы:</span>
-                          <p className="font-medium">{product.avgTubeLength} м</p>
+                          <span className="text-sm text-[#565D6D]">Средняя длина трубы:</span>
+                          <p className="font-medium text-[#171A1F]">{product.avgTubeLength} м</p>
                         </div>
                         <div>
-                          <span className="text-sm text-gray-600">Средний вес трубы:</span>
-                          <p className="font-medium">{product.avgTubeWeight} кг</p>
+                          <span className="text-sm text-[#565D6D]">Средний вес трубы:</span>
+                          <p className="font-medium text-[#171A1F]">{product.avgTubeWeight} кг</p>
                         </div>
                         <div>
-                          <span className="text-sm text-gray-600">Коэффициент:</span>
-                          <p className="font-medium">{product.koef}</p>
+                          <span className="text-sm text-[#565D6D]">Коэффициент:</span>
+                          <p className="font-medium text-[#171A1F]">{product.koef}</p>
                         </div>
                       </div>
                     </div>
@@ -227,22 +232,22 @@ export function ProductModal({
 
                   {/* Наличие */}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-[#171A1F] mb-4 flex items-center gap-2">
                       <Scale className="w-5 h-5" />
                       Наличие на складе
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {product.inStockT > 0 && (
                         <div className="bg-green-50 rounded-lg p-3">
-                          <div className="text-sm text-gray-600">В тоннах</div>
-                          <div className="text-xl font-bold text-green-600">
+                          <div className="text-sm text-[#565D6D]">В тоннах</div>
+                          <div className="text-xl font-bold text-[#22C55E]">
                             {product.inStockT.toFixed(2)} т
                           </div>
                         </div>
                       )}
                       {product.inStockM > 0 && (
                         <div className="bg-blue-50 rounded-lg p-3">
-                          <div className="text-sm text-gray-600">В метрах</div>
+                          <div className="text-sm text-[#565D6D]">В метрах</div>
                           <div className="text-xl font-bold text-blue-600">
                             {product.inStockM.toFixed(2)} м
                           </div>
@@ -253,36 +258,36 @@ export function ProductModal({
 
                   {/* Информация о складе */}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-[#171A1F] mb-4 flex items-center gap-2">
                       <MapPin className="w-5 h-5" />
                       Информация о складе
                     </h4>
                     <div className="space-y-3">
                       <div>
-                        <span className="text-sm text-gray-600">Склад:</span>
-                        <p className="font-medium">{product.stockName}</p>
+                        <span className="text-sm text-[#565D6D]">Склад:</span>
+                        <p className="font-medium text-[#171A1F]">{product.stockName}</p>
                       </div>
                       <div>
-                        <span className="text-sm text-gray-600">Адрес:</span>
-                        <p className="font-medium">{product.address}</p>
+                        <span className="text-sm text-[#565D6D]">Адрес:</span>
+                        <p className="font-medium text-[#171A1F]">{product.address}</p>
                       </div>
                       <div className="flex items-start gap-2">
-                        <Clock className="w-4 h-4 text-gray-500 mt-0.5" />
+                        <Clock className="w-4 h-4 text-[#565D6D] mt-0.5" />
                         <div>
-                          <span className="text-sm text-gray-600">Режим работы:</span>
-                          <p className="font-medium">{product.schedule}</p>
+                          <span className="text-sm text-[#565D6D]">Режим работы:</span>
+                          <p className="font-medium text-[#171A1F]">{product.schedule}</p>
                         </div>
                       </div>
                       <div>
-                        <span className="text-sm text-gray-600">Владелец:</span>
-                        <p className="font-medium">{product.ownerShortName}</p>
+                        <span className="text-sm text-[#565D6D]">Владелец:</span>
+                        <p className="font-medium text-[#171A1F]">{product.ownerShortName}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Способы оплаты */}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-[#171A1F] mb-4 flex items-center gap-2">
                       <CreditCard className="w-5 h-5" />
                       Способы оплаты
                     </h4>
@@ -304,13 +309,13 @@ export function ProductModal({
 
                   {/* Управление корзиной */}
                   <div className="border-t border-grayLight pt-6">
-                    <h4 className="text-lg font-semibold text-dark mb-4">Добавить в корзину</h4>
+                    <h4 className="text-lg font-semibold text-[#171A1F] mb-4">Добавить в корзину</h4>
                     
                     {!isInCart ? (
                       // Кнопка добавления в корзину
                       <div className="space-y-4">
                         <div className="flex items-center space-x-4">
-                          <span className="text-sm font-medium text-grayDark">Количество:</span>
+                          <span className="text-sm font-medium text-[#565D6D]">Количество:</span>
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={handleDecrement}
@@ -324,7 +329,7 @@ export function ProductModal({
                               type="number"
                               value={quantity}
                               onChange={handleInputChange}
-                              className="w-20 text-center border border-grayLight rounded px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                              className="w-20 text-center border border-[#DEE1E6] rounded-md px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-primary"
                               min="1"
                               max="999"
                             />
@@ -341,7 +346,7 @@ export function ProductModal({
                         <button
                           onClick={handleAddToCart}
                           disabled={!isInStock}
-                          className="w-full bg-primary hover:bg-primaryDark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-lg flex items-center justify-center gap-2"
+                          className="w-full bg-[#171A1F] hover:bg-[#1F1A1F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-md transition text-lg flex items-center justify-center gap-2"
                         >
                           <ShoppingCart className="w-5 h-5" />
                           {isInStock ? 'Добавить в корзину' : 'Нет в наличии'}
@@ -356,7 +361,7 @@ export function ProductModal({
                         </div>
                         
                         <div className="flex items-center space-x-4">
-                          <span className="text-sm font-medium text-grayDark">Изменить количество:</span>
+                          <span className="text-sm font-medium text-[#565D6D]">Изменить количество:</span>
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => onUpdateQuantity(product.id, cartQuantity - 1)}
@@ -372,7 +377,7 @@ export function ProductModal({
                                 const value = parseInt(e.target.value) || 1;
                                 onUpdateQuantity(product.id, Math.max(1, Math.min(999, value)));
                               }}
-                              className="w-20 text-center border border-grayLight rounded px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
+                              className="w-20 text-center border border-[#DEE1E6] rounded-md px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-primary touch-manipulation"
                               min="1"
                               max="999"
                             />
@@ -388,9 +393,9 @@ export function ProductModal({
                         
                         <button
                           onClick={() => onRemoveFromCart(product.id)}
-                          className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 touch-manipulation"
+                          className="w-full bg-[#F44336] hover:bg-red-600 text-white font-medium py-3 px-6 rounded-md transition touch-manipulation"
                         >
-                          Удалить из корзины
+                          Убрать из корзины
                         </button>
                       </div>
                     )}

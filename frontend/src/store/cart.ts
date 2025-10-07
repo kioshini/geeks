@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Api } from '../lib/api';
-import type { AddToCartDto, CartDto, CartItemDto, UpdateCartItemDto } from '../lib/api';
+import type { AddToCartDto, CartDto, UpdateCartItemDto } from '../lib/api';
 
 export type CartState = {
 	userId: number | null;

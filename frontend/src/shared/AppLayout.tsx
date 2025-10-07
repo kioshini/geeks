@@ -44,7 +44,9 @@ export function AppLayout() {
 								T
 							</div>
 							<div>
-								<h1 className="text-lg sm:text-xl font-bold text-white">TMK Mini App</h1>
+								<h1 className="text-lg sm:text-xl font-bold text-white">
+									<span className="text-[#E64A19]">T</span>MK Mini App
+								</h1>
 								<p className="text-xs sm:text-sm text-grayLight hidden sm:block">Steel Solutions</p>
 							</div>
 						</div>
