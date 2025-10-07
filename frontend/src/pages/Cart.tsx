@@ -44,7 +44,7 @@ export function CartPage() {
 								</h3>
 								<div className="flex items-center gap-4 mb-4">
 									<div className="text-lg font-semibold text-gray-700">
-										Цена: {item.price.toFixed(2)} ₽ за шт
+										Цена: {item.price.toFixed(2)} ₽ за {item.unit === 'т' ? 'тонну' : item.unit === 'м' ? 'метр' : 'шт'}
 									</div>
 									<div className="text-sm text-gray-500">
 										Материал: {item.product?.material || 'Не указан'}
@@ -61,7 +61,7 @@ export function CartPage() {
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
 										</svg>
 									</button>
-									<span className="w-16 text-center font-bold text-lg bg-gray-100 rounded-xl py-2">{item.quantity}</span>
+									<span className="w-16 text-center font-bold text-lg bg-gray-100 rounded-xl py-2">{item.quantity} {item.unit === 'т' ? 'т' : item.unit === 'м' ? 'м' : 'шт'}</span>
 									<button 
 										onClick={() => update(item.id, { quantity: item.quantity + 1 })} 
 										className="w-10 h-10 rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-orange-500 transition-all duration-200 font-bold text-lg"

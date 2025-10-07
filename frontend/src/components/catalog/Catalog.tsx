@@ -118,6 +118,12 @@ export function Catalog({
     return cartItem ? cartItem.quantity : 0;
   };
 
+  // Получаем единицу измерения товара в корзине
+  const getCartUnit = (productId: number): string => {
+    const cartItem = cartItems.find(item => item.product.id === productId);
+    return cartItem ? cartItem.unit : 'шт';
+  };
+
   // Обработчики событий
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -389,6 +395,7 @@ export function Catalog({
                 product={product}
                 viewMode={viewMode}
                 cartQuantity={getCartQuantity(product.id)}
+                cartUnit={getCartUnit(product.id)}
                 onAddToCart={onAddToCart}
                 onRemoveFromCart={onRemoveFromCart}
                 onUpdateQuantity={onUpdateQuantity}
@@ -433,6 +440,7 @@ export function Catalog({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         cartQuantity={selectedProduct ? getCartQuantity(selectedProduct.id) : 0}
+        cartUnit={selectedProduct ? getCartUnit(selectedProduct.id) : 'шт'}
         onAddToCart={onAddToCart}
         onRemoveFromCart={onRemoveFromCart}
         onUpdateQuantity={onUpdateQuantity}

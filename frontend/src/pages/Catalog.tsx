@@ -170,8 +170,8 @@ export function CatalogPage() {
       pipeWallThickness: item.product?.thickness || 0,
       inStockT: item.product?.stockQuantity || 0,
       inStockM: item.product?.stockQuantity || 0,
-      priceT: item.product?.price || 0,
-      priceM: item.product?.price ? item.product.price * 0.1 : 0,
+      priceT: item.product?.priceT || 0,
+      priceM: item.product?.priceM || 0,
       stockName: 'Екатеринбург',
       address: 'поселок Шувакиш, ул Зеленая, 50а',
       schedule: 'пн - чт 08.00-17.00, пт 08.00-15.45',
@@ -186,6 +186,7 @@ export function CatalogPage() {
       koef: 0.011782032
     },
     quantity: item.quantity,
+    unit: item.unit
   })) || [];
 
   return (

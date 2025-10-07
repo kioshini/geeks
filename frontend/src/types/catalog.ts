@@ -38,6 +38,7 @@ export type ViewMode = 'grid' | 'list';
 export interface CartItem {
   product: Product;
   quantity: number;
+  unit: string;
 }
 
 /**
@@ -59,6 +60,7 @@ export interface ProductCardProps {
   product: Product;
   viewMode: ViewMode;
   cartQuantity: number;
+  cartUnit: string;
   onAddToCart: (product: Product, quantity: number) => void;
   onRemoveFromCart: (productId: number) => void;
   onUpdateQuantity: (productId: number, quantity: number) => void;
@@ -73,6 +75,7 @@ export interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   cartQuantity: number;
+  cartUnit: string;
   onAddToCart: (product: Product, quantity: number) => void;
   onRemoveFromCart: (productId: number) => void;
   onUpdateQuantity: (productId: number, quantity: number) => void;
