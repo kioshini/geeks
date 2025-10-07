@@ -142,6 +142,8 @@ namespace TMKMiniApp.Services
                 Thickness = product.Thickness,
                 Unit = product.Unit,
                 Price = product.Price,
+                PriceT = product.PriceT,
+                PriceM = product.PriceM,
                 StockQuantity = product.StockQuantity,
                 IsAvailable = product.IsAvailable,
                 
@@ -267,7 +269,8 @@ namespace TMKMiniApp.Services
                     return false;
                 }
 
-                var idToPrice = new Dictionary<string, decimal>();
+                var idToPriceT = new Dictionary<string, decimal>();
+                var idToPriceM = new Dictionary<string, decimal>();
                 if (File.Exists(pricesPath))
                 {
                     // Загружаем цены из JSON файла
@@ -278,9 +281,16 @@ namespace TMKMiniApp.Services
                         {
                             foreach (var price in pricesDoc.ArrayOfPricesEl)
                             {
-                                if (!string.IsNullOrEmpty(price.ID) && price.PriceT > 0)
+                                if (!string.IsNullOrEmpty(price.ID))
                                 {
-                                    idToPrice[price.ID] = (decimal)price.PriceT;
+                                    if (price.PriceT > 0)
+                                    {
+                                        idToPriceT[price.ID] = (decimal)price.PriceT;
+                                    }
+                                    if (price.PriceM > 0)
+                                    {
+                                        idToPriceM[price.ID] = (decimal)price.PriceM;
+                                    }
                                 }
                             }
                         }
@@ -328,16 +338,29 @@ namespace TMKMiniApp.Services
                     decimal? diameter = n.Diameter.HasValue ? (decimal?)Convert.ToDecimal(n.Diameter.Value) : null;
                     decimal? thickness = n.PipeWallThickness.HasValue ? (decimal?)Convert.ToDecimal(n.PipeWallThickness.Value) : null;
 
-                    // Цена: из файла цен по ID товара
+                    // Цены: из файла цен по ID товара
                     decimal price = 0m;
-                    if (!string.IsNullOrEmpty(n.ID) && idToPrice.TryGetValue(n.ID, out var p))
+                    decimal priceT = 0m;
+                    decimal priceM = 0m;
+                    
+                    if (!string.IsNullOrEmpty(n.ID))
                     {
-                        price = p;
+                        if (idToPriceT.TryGetValue(n.ID, out var pT))
+                        {
+                            priceT = pT;
+                            price = pT; // Основная цена - за тонну
+                        }
+                        if (idToPriceM.TryGetValue(n.ID, out var pM))
+                        {
+                            priceM = pM;
+                        }
                     }
-                    else if (n.Koef.HasValue)
+                    
+                    if (price == 0 && n.Koef.HasValue)
                     {
                         // грубая цена как коэффициент * 100000 (для демонстрации)
                         price = Math.Round((decimal)n.Koef.Value * 100000m, 2);
+                        priceT = price;
                     }
 
                     var stock = 0;
@@ -381,6 +404,8 @@ namespace TMKMiniApp.Services
                         Thickness = thickness,
                         Unit = "м",
                         Price = price,
+                        PriceT = priceT,
+                        PriceM = priceM,
                         StockQuantity = stock,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow

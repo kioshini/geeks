@@ -25,6 +25,8 @@ export type ProductDto = {
 	thickness?: number;
 	unit?: string;
 	price: number;
+	priceT: number; // Цена за тонну
+	priceM: number; // Цена за метр
 	stockQuantity: number;
 	isAvailable: boolean;
 	

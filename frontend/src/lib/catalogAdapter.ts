@@ -16,8 +16,8 @@ export function adaptProductDtoToProduct(dto: ProductDto): Product {
     pipeWallThickness: dto.thickness || 0,
     inStockT: dto.stockQuantity || 0,
     inStockM: dto.stockQuantity || 0, // Для демонстрации используем то же значение
-    priceT: dto.price || 0, // Цена за тонну (основная цена)
-    priceM: dto.price ? dto.price * 0.1 : 0, // Цена за метр (примерно 10% от цены за тонну)
+    priceT: dto.priceT || 0, // Цена за тонну из API
+    priceM: dto.priceM || 0, // Цена за метр из API
     stockName: 'Екатеринбург', // Заглушка
     address: 'поселок Шувакиш, ул Зеленая, 50а', // Заглушка
     schedule: 'пн - чт 08.00-17.00, пт 08.00-15.45', // Заглушка

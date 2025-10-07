@@ -15,6 +15,8 @@ namespace TMKMiniApp.Models.DTOs
         public decimal? Thickness { get; set; }
         public string? Unit { get; set; }
         public decimal Price { get; set; }
+        public decimal PriceT { get; set; } // Цена за тонну
+        public decimal PriceM { get; set; } // Цена за метр
         public int StockQuantity { get; set; }
         public bool IsAvailable { get; set; }
         

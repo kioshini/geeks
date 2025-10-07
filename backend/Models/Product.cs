@@ -30,6 +30,10 @@ namespace TMKMiniApp.Models
         
         public decimal Price { get; set; }
         
+        public decimal PriceT { get; set; } // Цена за тонну
+        
+        public decimal PriceM { get; set; } // Цена за метр
+        
         public int StockQuantity { get; set; }
         
         public bool IsAvailable => StockQuantity > 0;
