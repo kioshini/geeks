@@ -280,7 +280,7 @@ namespace TMKMiniApp.Services
                             {
                                 if (!string.IsNullOrEmpty(price.ID) && price.PriceT > 0)
                                 {
-                                    idToPrice[price.ID] = price.PriceT;
+                                    idToPrice[price.ID] = (decimal)price.PriceT;
                                 }
                             }
                         }
@@ -330,7 +330,7 @@ namespace TMKMiniApp.Services
 
                     // Цена: из файла цен по ID товара
                     decimal price = 0m;
-                    if (idToPrice.TryGetValue(n.ID, out var p))
+                    if (!string.IsNullOrEmpty(n.ID) && idToPrice.TryGetValue(n.ID, out var p))
                     {
                         price = p;
                     }
@@ -341,7 +341,7 @@ namespace TMKMiniApp.Services
                     }
 
                     var stock = 0;
-                    if (idToStock.TryGetValue(n.ID, out var s))
+                    if (!string.IsNullOrEmpty(n.ID) && idToStock.TryGetValue(n.ID, out var s))
                     {
                         stock = s;
                     }
