@@ -140,7 +140,7 @@ function nomenclatureToProduct(nomenclature: NomenclatureEl): Product {
   // const type = findTypeById(nomenclature.IDType);
   
   return {
-    id: nomenclature.ID,
+    id: parseInt(nomenclature.ID, 10),
     name: nomenclature.Name,
     gost: nomenclature.Gost,
     manufacturer: nomenclature.Manufacturer,

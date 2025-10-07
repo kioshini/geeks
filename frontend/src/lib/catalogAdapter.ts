@@ -7,7 +7,7 @@ import type { Product } from '../types/catalog';
  */
 export function adaptProductDtoToProduct(dto: ProductDto): Product {
   return {
-    id: dto.id.toString(),
+    id: dto.id,
     name: dto.name,
     gost: 'Не указан', // Заглушка, так как gost нет в ProductDto
     manufacturer: 'Не указан', // Заглушка, так как manufacturer нет в ProductDto

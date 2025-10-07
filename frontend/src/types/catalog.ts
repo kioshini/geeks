@@ -2,7 +2,7 @@
  * Интерфейс для товара в каталоге
  */
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   gost: string;
   manufacturer: string;
@@ -46,8 +46,8 @@ export interface CartItem {
 export interface CatalogProps {
   products: Product[];
   onAddToCart: (product: Product, quantity: number) => void;
-  onRemoveFromCart: (productId: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onRemoveFromCart: (productId: number) => void;
+  onUpdateQuantity: (productId: number, quantity: number) => void;
   cartItems: CartItem[];
   resetFiltersTrigger?: number; // Триггер для сброса фильтров
 }
@@ -60,8 +60,8 @@ export interface ProductCardProps {
   viewMode: ViewMode;
   cartQuantity: number;
   onAddToCart: (product: Product, quantity: number) => void;
-  onRemoveFromCart: (productId: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onRemoveFromCart: (productId: number) => void;
+  onUpdateQuantity: (productId: number, quantity: number) => void;
   onProductClick: (product: Product) => void;
 }
 
@@ -74,8 +74,8 @@ export interface ProductModalProps {
   onClose: () => void;
   cartQuantity: number;
   onAddToCart: (product: Product, quantity: number) => void;
-  onRemoveFromCart: (productId: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onRemoveFromCart: (productId: number) => void;
+  onUpdateQuantity: (productId: number, quantity: number) => void;
 }
 
 /**

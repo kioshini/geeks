@@ -113,7 +113,7 @@ export function Catalog({
 
 
   // Получаем количество конкретного товара в корзине
-  const getCartQuantity = (productId: string): number => {
+  const getCartQuantity = (productId: number): number => {
     const cartItem = cartItems.find(item => item.product.id === productId);
     return cartItem ? cartItem.quantity : 0;
   };

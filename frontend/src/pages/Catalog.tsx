@@ -130,24 +130,24 @@ export function CatalogPage() {
   const handleAddToCart = (product: Product, quantity: number) => {
     console.log('CatalogPage: Добавление в корзину', { productId: product.id, quantity, productName: product.name, unit: selectedUnit });
     try {
-      add({ productId: product.id, quantity, unit: selectedUnit });
+      add({ productId: product.id.toString(), quantity, unit: selectedUnit });
       console.log('CatalogPage: Товар успешно добавлен в корзину');
     } catch (error) {
       console.error('CatalogPage: Ошибка при добавлении в корзину:', error);
     }
   };
 
-  const handleRemoveFromCart = (productId: string) => {
+  const handleRemoveFromCart = (productId: number) => {
     console.log('CatalogPage: Удаление из корзины', { productId });
-    removeByProductId(productId);
+    removeByProductId(productId.toString());
   };
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
+  const handleUpdateQuantity = (productId: number, quantity: number) => {
     console.log('CatalogPage: Обновление количества', { productId, quantity, unit: selectedUnit });
     if (quantity <= 0) {
       handleRemoveFromCart(productId);
     } else {
-      updateByProductId(productId, { quantity, unit: selectedUnit });
+      updateByProductId(productId.toString(), { quantity, unit: selectedUnit });
     }
   };
 
@@ -165,7 +165,7 @@ export function CatalogPage() {
   // Преобразуем данные корзины из глобального состояния в формат для Catalog
   const cartItems: CartItem[] = cart?.items.map(item => ({
     product: {
-      id: item.productId.toString(),
+      id: parseInt(item.productId, 10),
       name: item.product?.name || `Товар #${item.productId}`,
       gost: 'Не указан',
       manufacturer: 'Не указан',
