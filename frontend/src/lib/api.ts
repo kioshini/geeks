@@ -175,6 +175,7 @@ export type CreateOrderDto = {
 };
 
 export type OrderRequest = {
+	UserId: number;
 	firstName: string;
 	lastName: string;
 	INN: string;

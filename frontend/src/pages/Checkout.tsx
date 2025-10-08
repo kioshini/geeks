@@ -121,6 +121,7 @@ export function CheckoutPage() {
 		try {
 			// Используем новый API для создания заказа
 			const orderRequest: OrderRequest = {
+				UserId: userId,
 				firstName: firstName.trim(),
 				lastName: lastName.trim(),
 				INN: inn.trim().replace(/\D/g, ''), // Убираем все нецифровые символы
