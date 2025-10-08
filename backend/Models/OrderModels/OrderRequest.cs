@@ -9,6 +9,10 @@ namespace TMKMiniApp.Models.OrderModels
     /// </summary>
     public class OrderRequest
     {
+        [Required(ErrorMessage = "ID пользователя обязателен")]
+        [JsonPropertyName("UserId")]
+        public long UserId { get; set; }
+
         [Required(ErrorMessage = "Имя обязательно для заполнения")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Имя должно содержать от 2 до 100 символов")]
         [JsonPropertyName("FirstName")]

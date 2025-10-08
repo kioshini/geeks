@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TMKMiniApp.Models;
 using TMKMiniApp.Models.DTOs;
 using TMKMiniApp.Models.OrderModels;
 using TMKMiniApp.Services;
@@ -211,6 +212,74 @@ namespace TMKMiniApp.Controllers
             {
                 _logger.LogError(ex, "Ошибка при получении заказов по статусу {Status}", status);
                 return StatusCode(500, "Внутренняя ошибка сервера");
+            }
+        }
+
+        /// <summary>
+        /// Тестировать Telegram API
+        /// </summary>
+        [HttpPost("test-telegram")]
+        public async Task<ActionResult> TestTelegram()
+        {
+            try
+            {
+                _logger.LogInformation("🧪 Тестирование Telegram API");
+                
+                // Создаем тестовый заказ
+                var testOrder = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = 999001,
+                    FirstName = "Тест",
+                    LastName = "Пользователь",
+                    INN = "1234567890",
+                    Phone = "+7 (999) 123-45-67",
+                    Email = "test@example.com",
+                    Comment = "Тестовый заказ для проверки Telegram API",
+                    Items = new List<OrderItem>
+                    {
+                        new OrderItem
+                        {
+                            Id = 1,
+                            ID = "10001",
+                            Name = "Тестовый товар",
+                            Quantity = 1,
+                            Unit = "шт",
+                            Price = 1000.00m,
+                            CreatedAt = DateTime.UtcNow
+                        }
+                    },
+                    TotalPrice = 1000.00m,
+                    Status = OrderStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                // Получаем TelegramService из DI
+                var telegramService = HttpContext.RequestServices.GetService<ITelegramService>();
+                if (telegramService == null)
+                {
+                    _logger.LogError("❌ TelegramService не найден в DI контейнере");
+                    return StatusCode(500, "TelegramService не настроен");
+                }
+
+                // Отправляем тестовый заказ
+                await telegramService.SendOrderAsync(testOrder);
+                
+                return Ok(new { 
+                    success = true, 
+                    message = "Тестовый заказ отправлен в Telegram",
+                    orderId = testOrder.Id
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Ошибка при тестировании Telegram API");
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "Ошибка при тестировании Telegram API",
+                    error = ex.Message
+                });
             }
         }
     }

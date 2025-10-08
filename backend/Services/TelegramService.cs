@@ -40,21 +40,33 @@ namespace TMKMiniApp.Services
 
         public async Task SendOrderAsync(Order order)
         {
+            _logger.LogInformation("🔍 Попытка отправить заказ #{OrderId} в Telegram", order.Id);
+            _logger.LogInformation("🔑 BotToken: {BotToken}", string.IsNullOrEmpty(_botToken) ? "НЕ НАСТРОЕН" : "НАСТРОЕН");
+            _logger.LogInformation("💬 ChatId: {ChatId}", string.IsNullOrEmpty(_chatId) ? "НЕ НАСТРОЕН" : _chatId);
+
+            if (string.IsNullOrEmpty(_botToken))
+            {
+                _logger.LogError("❌ Не удалось отправить заказ: BotToken не настроен");
+                return;
+            }
+
             if (string.IsNullOrEmpty(_chatId))
             {
-                _logger.LogError("Не удалось отправить заказ: ChatId не настроен");
+                _logger.LogError("❌ Не удалось отправить заказ: ChatId не настроен");
                 return;
             }
 
             try
             {
                 var message = FormatOrderMessage(order);
+                _logger.LogInformation("📝 Сформировано сообщение для Telegram: {MessageLength} символов", message.Length);
+                
                 await SendMessageAsync(message);
-                _logger.LogInformation($"Заказ #{order.Id} успешно отправлен в Telegram");
+                _logger.LogInformation("✅ Заказ #{OrderId} успешно отправлен в Telegram", order.Id);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Ошибка при отправке заказа #{order.Id} в Telegram");
+                _logger.LogError(ex, "❌ Ошибка при отправке заказа #{OrderId} в Telegram", order.Id);
             }
         }
 
@@ -123,6 +135,7 @@ namespace TMKMiniApp.Services
         private async Task SendMessageAsync(string message)
         {
             var url = $"https://api.telegram.org/bot{_botToken}/sendMessage";
+            _logger.LogInformation("🌐 Отправка запроса на URL: {Url}", url);
             
             var payload = new
             {
@@ -132,15 +145,23 @@ namespace TMKMiniApp.Services
             };
 
             var json = JsonSerializer.Serialize(payload);
+            _logger.LogInformation("📤 Payload: {Payload}", json);
+            
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(url, content);
+            _logger.LogInformation("📥 Получен ответ: StatusCode={StatusCode}", response.StatusCode);
+            
+            var responseContent = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("📄 Содержимое ответа: {ResponseContent}", responseContent);
             
             if (!response.IsSuccessStatusCode)
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Ошибка Telegram API: {response.StatusCode} - {errorContent}");
+                _logger.LogError("❌ Ошибка Telegram API: {StatusCode} - {ErrorContent}", response.StatusCode, responseContent);
+                throw new Exception($"Ошибка Telegram API: {response.StatusCode} - {responseContent}");
             }
+            
+            _logger.LogInformation("✅ Сообщение успешно отправлено в Telegram");
         }
     }
 }

@@ -140,7 +140,7 @@ namespace TMKMiniApp.Services
             var order = new Order
             {
                 Id = Guid.NewGuid(),
-                UserId = 1, // Временное значение, в реальном приложении получать из контекста пользователя
+                UserId = orderRequest.UserId, // Используем UserId из запроса
                 FirstName = orderRequest.FirstName,
                 LastName = orderRequest.LastName,
                 INN = orderRequest.INN,
