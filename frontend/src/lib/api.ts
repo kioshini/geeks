@@ -190,6 +190,21 @@ export type OrderRequest = {
 		price: number;
 	}>;
 };
+
+export type PriceCalculationRequest = {
+	ProductId: string;
+	Quantity: number;
+	Unit: string;
+};
+
+export type PriceCalculationResponse = {
+	ProductId: string;
+	Quantity: number;
+	Unit: string;
+	FinalPrice: number;
+	TotalAmount: number;
+	Timestamp: string;
+};
 export type OrderDto = {
 	id: number;
 	userId: number;
@@ -242,6 +257,13 @@ export const Api = {
 	 * @returns Promise resolving to array of product types
 	 */
 	getProductTypes: async () => (await api.get<ProductType[]>(`/api/products/categories`)).data,
+
+	/**
+	 * Calculate price with discounts
+	 * @param request - Price calculation request
+	 * @returns Promise resolving to calculated price
+	 */
+	calculatePrice: async (request: PriceCalculationRequest) => (await api.post<PriceCalculationResponse>(`/api/products/calculate-price`, request)).data,
 
 	/**
 	 * Get user's shopping cart

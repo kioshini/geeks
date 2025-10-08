@@ -1,5 +1,7 @@
 import type { ProductDto } from '../lib/api';
 import { useUnit } from '../hooks/useUnit';
+import { useState, useEffect } from 'react';
+import { Api } from '../lib/api';
 
 /**
  * Props for ProductCard component
@@ -27,6 +29,32 @@ interface ProductCardProps {
  */
 export function ProductCard({ product, onAdd }: ProductCardProps) {
   const { selectedUnit } = useUnit();
+  const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  // Динамический пересчёт цены при изменении единицы измерения
+  useEffect(() => {
+    const calculatePrice = async () => {
+      if (!product.id) return;
+      
+      setIsCalculating(true);
+      try {
+        const response = await Api.calculatePrice({
+          ProductId: product.id.toString(),
+          Quantity: 1, // Базовая цена за 1 единицу
+          Unit: selectedUnit === 'т' ? 'т' : 'м'
+        });
+        setCalculatedPrice(response.FinalPrice);
+      } catch (error) {
+        console.error('Ошибка при расчёте цены:', error);
+        setCalculatedPrice(null);
+      } finally {
+        setIsCalculating(false);
+      }
+    };
+
+    calculatePrice();
+  }, [product.id, selectedUnit]);
 	return (
 		<div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
 			<div className="flex items-start justify-between mb-3">
@@ -69,19 +97,20 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
 
 			<div className="flex items-center justify-between">
 				<div>
-					{/* Price with discount */}
+					{/* Price with dynamic calculation */}
 					<div className="flex items-center gap-2">
-						{product.finalPrice && product.finalPrice < product.price ? (
+						{isCalculating ? (
+							<div className="text-xl font-semibold text-gray-500">
+								Расчёт...
+							</div>
+						) : calculatedPrice ? (
 							<>
 								<div className="text-xl font-semibold text-green-600">
-									{product.finalPrice.toFixed(2)} ₽
+									{calculatedPrice.toFixed(2)} ₽
 								</div>
-								<div className="text-lg text-gray-400 line-through">
-									{product.price.toFixed(2)} ₽
-								</div>
-								{product.totalDiscountPercent && product.totalDiscountPercent > 0 && (
-									<div className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-										-{product.totalDiscountPercent.toFixed(0)}%
+								{calculatedPrice < product.price && (
+									<div className="text-lg text-gray-400 line-through">
+										{product.price.toFixed(2)} ₽
 									</div>
 								)}
 							</>
