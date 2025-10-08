@@ -4,11 +4,12 @@
   "description": "TMK Mini App - Telegram Mini App for pipe products catalog",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm run build",
+    "build": "cd frontend && npm install && npm run build",
     "dev": "cd frontend && npm run dev",
     "start": "cd frontend && npm run start",
     "install:frontend": "cd frontend && npm install",
-    "install:backend": "cd backend && dotnet restore"
+    "install:backend": "cd backend && dotnet restore",
+    "prebuild": "npm run install:frontend"
   },
   "workspaces": [
     "frontend",

@@ -2,9 +2,11 @@ import { type FormEvent, useEffect, useState } from 'react';
 import type { OrderRequest } from '../lib/api';
 import { useCartStore } from '../store/cart';
 import { Telegram } from '../lib/telegram';
+import { useNavigate } from 'react-router-dom';
 
 export function CheckoutPage() {
-	const { cart, userId, setUserId, loadCart } = useCartStore();
+	const { cart, userId, setUserId, loadCart, clear } = useCartStore();
+	const navigate = useNavigate();
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
 	const [inn, setInn] = useState('');
@@ -23,6 +25,41 @@ export function CheckoutPage() {
 		if (u?.last_name) setLastName(u.last_name);
 		loadCart();
 	}, [setUserId, loadCart]);
+
+	// Telegram BackButton для возврата в корзину
+	useEffect(() => {
+		Telegram.showBackButton(() => {
+			Telegram.haptic('selection');
+			navigate('/cart');
+		});
+
+		// Cleanup при размонтировании компонента
+		return () => {
+			Telegram.hideBackButton();
+		};
+	}, [navigate]);
+
+	// Telegram MainButton для отправки заказа
+	useEffect(() => {
+		if (cart && cart.items.length > 0 && human && !loading) {
+			Telegram.showMainButton('Отправить заказ', () => {
+				Telegram.haptic('impact');
+				// Находим форму и отправляем её
+				const form = document.querySelector('form');
+				if (form) {
+					const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+					form.dispatchEvent(submitEvent);
+				}
+			});
+		} else {
+			Telegram.hideMainButton();
+		}
+
+		// Cleanup при размонтировании компонента
+		return () => {
+			Telegram.hideMainButton();
+		};
+	}, [cart, human, loading]);
 
 	// Валидация полей
 	const validateForm = () => {
@@ -125,7 +162,16 @@ export function CheckoutPage() {
 				setHuman(false);
 				
 				// Очищаем корзину
-				// TODO: Добавить метод очистки корзины в store
+				await clear();
+				
+				// Показываем уведомление через Telegram
+				Telegram.showAlert(`Заказ #${data.orderId} успешно отправлен!`);
+				Telegram.haptic('notification');
+				
+				// Возвращаемся в каталог
+				setTimeout(() => {
+					navigate('/');
+				}, 2000);
 				
 				setMessage(`Заказ #${data.orderId} успешно отправлен!`);
 			} else {

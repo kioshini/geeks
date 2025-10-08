@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useCartStore } from '../store/cart';
 import { Telegram } from '../lib/telegram';
+import { useNavigate } from 'react-router-dom';
 
 export function CartPage() {
 	const { cart, loadCart, update, remove, clear, userId, setUserId, loading } = useCartStore();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!userId) {
@@ -15,6 +17,23 @@ export function CartPage() {
 	useEffect(() => {
 		if (userId) loadCart();
 	}, [userId, loadCart]);
+
+	// Telegram MainButton для оформления заказа
+	useEffect(() => {
+		if (cart && cart.items.length > 0) {
+			Telegram.showMainButton('Оформить заказ', () => {
+				Telegram.haptic('impact');
+				navigate('/checkout');
+			});
+		} else {
+			Telegram.hideMainButton();
+		}
+
+		// Cleanup при размонтировании компонента
+		return () => {
+			Telegram.hideMainButton();
+		};
+	}, [cart, navigate]);
 
 	if (!userId) return <div className="py-10 text-center text-sm text-steel-500">Ожидание Telegram пользователя...</div>;
 	if (!cart) return <div className="py-10 text-center text-sm text-steel-500">{loading ? 'Загрузка...' : 'Корзина пуста'}</div>;

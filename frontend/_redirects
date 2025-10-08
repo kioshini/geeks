@@ -1,0 +1,13 @@
+# Cloudflare Pages redirects for Telegram Mini App
+# Все запросы к /api/* перенаправляем на backend
+/api/* https://your-backend-url.com/api/:splat 200
+
+# SPA fallback - все остальные запросы идут на index.html
+# Это необходимо для React Router
+/* /index.html 200
+
+# CORS headers for Telegram WebApp
+/*
+  X-Frame-Options: ALLOWALL
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer-when-downgrade

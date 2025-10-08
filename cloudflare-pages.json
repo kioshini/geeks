@@ -1,0 +1,18 @@
+{
+  "build": {
+    "command": "npm run build",
+    "cwd": ".",
+    "watchPaths": [
+      "frontend/src/**/*",
+      "frontend/package.json",
+      "frontend/vite.config.ts"
+    ]
+  },
+  "deployment": {
+    "production": {
+      "env": {
+        "NODE_VERSION": "18"
+      }
+    }
+  }
+}

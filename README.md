@@ -1,10 +1,20 @@
-# TMK Mini App
+# 🚀 TMK Telegram Mini App
 
 ## 📖 Описание проекта
 
-Telegram Mini App для автоматизации заказов трубной продукции.  
+**Telegram Mini App** для автоматизации заказов трубной продукции с полной интеграцией Telegram WebApp SDK.  
 Разработано для хакатона РадиоХак 2.0 (ИРИТ-РТФ, ТМК, 2025).  
-Цель — цифровизация процесса поиска, выбора и оформления заказов на трубную продукцию.
+Цель — цифровизация процесса поиска, выбора и оформления заказов на трубную продукцию через Telegram.
+
+## 🤖 Telegram Mini App Features
+
+- ✅ **Telegram WebApp SDK** - полная интеграция с Telegram
+- ✅ **MainButton** - кнопка оформления заказа в Telegram
+- ✅ **BackButton** - навигация назад в Telegram
+- ✅ **Haptic Feedback** - тактильная обратная связь
+- ✅ **User Data** - автоматическое получение данных пользователя
+- ✅ **Theme Support** - поддержка темной/светлой темы Telegram
+- ✅ **Responsive Design** - адаптивный дизайн для мобильных устройств
 
 ## ⚙️ Функциональные возможности
 
@@ -162,6 +172,117 @@ npm run dev
 ```bash
 docker-compose up --build
 ```
+
+## 🌐 Развертывание как Telegram Mini App
+
+### 1. Получение HTTPS URL
+
+**Cloudflare Tunnel (Рекомендуется):**
+```bash
+# Установите cloudflared
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb
+
+# Создайте туннели
+cloudflared tunnel --url http://localhost:5173  # Frontend
+cloudflared tunnel --url http://localhost:5000  # Backend
+```
+
+**Альтернативные туннели:**
+```bash
+# localtunnel
+npx localtunnel --port 5173
+npx localtunnel --port 5000
+
+# serveo
+ssh -R 80:localhost:5173 serveo.net
+ssh -R 80:localhost:5000 serveo.net
+```
+
+### 2. Настройка Telegram Bot
+
+1. **Создайте бота через @BotFather:**
+   - Отправьте `/newbot`
+   - Введите имя и username бота
+   - Сохраните токен
+
+2. **Настройте Mini App:**
+```
+/setdomain
+@your_bot_username
+https://your-frontend-url.com
+```
+
+3. **Создайте команды:**
+```
+/setcommands
+@your_bot_username
+start - Запустить приложение
+help - Помощь
+```
+
+### 3. Настройка переменных окружения
+
+**Frontend (.env):**
+```env
+VITE_API_BASE_URL=https://your-backend-url.com
+```
+
+**Backend (appsettings.json):**
+```json
+{
+  "Telegram": {
+    "BotToken": "YOUR_BOT_TOKEN",
+    "ChatId": "YOUR_CHAT_ID"
+  }
+}
+```
+
+### 4. Сборка для production
+
+```bash
+cd frontend
+npm run build
+```
+
+### 5. Развертывание
+
+**Cloudflare Pages (Рекомендуется):**
+- Подключите GitHub репозиторий к Cloudflare Pages
+- Build command: `npm run build`
+- Build output directory: `frontend/dist`
+- Настройте переменные окружения
+
+**Vercel:**
+```bash
+npm i -g vercel
+vercel --prod
+```
+
+**Render:**
+- Создайте Static Site
+- Подключите GitHub репозиторий
+- Build command: `cd frontend && npm run build`
+- Publish directory: `frontend/dist`
+
+## 📱 Тестирование Mini App
+
+1. **Найдите вашего бота в Telegram**
+2. **Отправьте `/start`**
+3. **Нажмите на кнопку меню или отправьте команду**
+4. **Проверьте функциональность:**
+   - Просмотр каталога
+   - Добавление в корзину
+   - Оформление заказа
+   - Telegram кнопки (MainButton, BackButton)
+   - Тактильная обратная связь
+
+## 📚 Подробная документация
+
+- **Развертывание:** [TELEGRAM_MINIAPP_DEPLOYMENT.md](./TELEGRAM_MINIAPP_DEPLOYMENT.md)
+- **Cloudflare Pages:** [CLOUDFLARE_PAGES_DEPLOY.md](./CLOUDFLARE_PAGES_DEPLOY.md)
+- **Быстрый старт:** [QUICK_TELEGRAM_SETUP.md](./QUICK_TELEGRAM_SETUP.md)
+- **Использование:** [TELEGRAM_MINIAPP_USAGE.md](./TELEGRAM_MINIAPP_USAGE.md)
 
 ## 📊 API Endpoints
 
